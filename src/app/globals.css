@@ -1,0 +1,1119 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Apex Routes — design system v3
+   Black & white, dominant. YELLOW is the single accent.
+   ============================================================ */
+@theme {
+  /* neutral scale: near-black -> white */
+  --color-slate-50: #fafafa;
+  --color-slate-100: #f0f0f0;
+  --color-slate-200: #d4d4d4;
+  --color-slate-300: #a3a3a3;
+  --color-slate-400: #8a8a8a;
+  --color-slate-500: #6e6e6e;
+  --color-slate-600: #4a4a4a;
+  --color-slate-700: #2a2a2a;
+  --color-slate-800: #161616;
+  --color-slate-900: #0d0d0d;
+  --color-slate-950: #050507;
+
+  /* the ONE accent: yellow (all accent tokens resolve to yellow) */
+  --color-orange-400: #fff27a;
+  --color-orange-500: #ffe600;
+  --color-orange-600: #e6cf00;
+  --color-blue-500: #ffe600;
+  --color-blue-600: #e6cf00;
+  --color-cyan-400: #ffe600;
+  --color-cyan-500: #e6cf00;
+  --color-teal-400: #ffe600;
+  --color-teal-500: #e6cf00;
+  --color-emerald-400: #ffe600;
+  --color-emerald-500: #e6cf00;
+  /* stray red kept neutral so nothing introduces a second hue */
+  --color-rose-400: #d4d4d4;
+  --color-rose-500: #b0b0b0;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, sans-serif;
+  --font-display: "Space Grotesk", "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  --accent: #ffe600;
+}
+
+@layer base {
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    background: #050507;
+    color: #f5f5f5;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: #ffe600;
+    color: #050507;
+  }
+
+  /* tastbare focus voor toetsenbordgebruikers */
+  :focus-visible {
+    outline: 2px solid #ffe600;
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+}
+
+/* ---------- scrollbar ---------- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2a2a2a transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+  border-radius: 8px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ---------- helpers ---------- */
+.text-gradient {
+  background: linear-gradient(100deg, #fff27a 0%, #ffe600 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* solid black panels, crisp borders */
+.glass {
+  background: rgba(12, 12, 12, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.btn-brand {
+  background: #ffe600;
+  color: #050507;
+  font-weight: 700;
+  box-shadow: 0 10px 30px rgba(255, 230, 0, 0.22);
+  transition: filter 0.18s ease, transform 0.12s ease, box-shadow 0.18s ease;
+}
+.btn-brand:hover {
+  filter: brightness(1.05);
+  box-shadow: 0 14px 40px rgba(255, 230, 0, 0.32);
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #f5f5f5;
+  transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease;
+}
+.btn-ghost:hover {
+  border-color: #ffe600;
+  color: #ffe600;
+}
+
+.glow {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(150px);
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+/* ---------- chat ---------- */
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.msg-pop {
+  animation: pop 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.typing i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #8a8a8a;
+  display: inline-block;
+  animation: blink 1.2s infinite;
+}
+.typing i:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.typing i:nth-child(3) {
+  animation-delay: 0.4s;
+}
+@keyframes blink {
+  0%,
+  80%,
+  100% {
+    opacity: 0.25;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+.route-draw {
+  stroke-dasharray: 26000;
+  stroke-dashoffset: 26000;
+  animation: drawline 1.6s ease forwards;
+}
+@keyframes drawline {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .msg-pop,
+  .route-draw,
+  .typing i {
+    animation: none !important;
+  }
+  .route-draw {
+    stroke-dashoffset: 0 !important;
+  }
+}
+
+/* ---------- leaflet ---------- */
+.leaflet-container {
+  background: #050507;
+  font-family: var(--font-sans);
+}
+.leaflet-control-attribution {
+  background: rgba(6, 6, 6, 0.7) !important;
+  color: #6e6e6e !important;
+  font-size: 10px !important;
+}
+.leaflet-control-attribution a {
+  color: #a3a3a3 !important;
+}
+.leaflet-bar a {
+  background: rgba(13, 13, 13, 0.95) !important;
+  color: #f5f5f5 !important;
+  border-bottom-color: rgba(255, 255, 255, 0.14) !important;
+}
+.leaflet-bar a:hover {
+  background: rgba(22, 22, 22, 0.98) !important;
+}
+
+/* dark treatment for the key-free OSM tiles */
+.apex-dark-tiles {
+  filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.85)
+    saturate(0.85);
+}
+/* ---------- navigatie-ankers en focus-pulse ---------- */
+/* Genummerde stipjes op de routelijn: de punten die Google Maps meekrijgt. */
+.apex-anchor {
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: #0d0d0d;
+  border: 2px solid #ffe600;
+  color: #ffe600;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 12px;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* POI langs de route (tankstation/laadpaal): compacte donkere chip */
+.apex-poi {
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  background: rgba(13, 13, 13, 0.95);
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+  font-size: 11px;
+  line-height: 19px;
+  text-align: center;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.7);
+}
+
+/* Kortstondige pulse op de afslag die je in de routebeschrijving aanklikt. */
+.apex-focus {
+  position: relative;
+  width: 22px;
+  height: 22px;
+}
+.apex-focus::before,
+.apex-focus span {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 2px solid #ffe600;
+}
+.apex-focus::before {
+  animation: apex-ping 1.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+.apex-focus span {
+  inset: 6px;
+  background: #ffe600;
+}
+@keyframes apex-ping {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .apex-focus::before {
+    animation: none;
+  }
+}
+
+/* ---------- printen: alleen de routebeschrijving ---------- */
+@media print {
+  html,
+  body {
+    background: #ffffff !important;
+    color: #111111 !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* de app is een fullscreen-layout; voor print laten we alles gewoon stromen */
+  .apex-shell,
+  .apex-main {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+    position: static !important;
+  }
+
+  /* de route-samenvatting is op het scherm een zwevende kaart */
+  .apex-print-card {
+    position: static !important;
+    width: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    color: #111111 !important;
+  }
+  .apex-print-card * {
+    color: #111111 !important;
+  }
+  .apex-print-card .bg-white\/5,
+  .apex-print-card .bg-white\/\[0\.03\] {
+    background: #f4f4f5 !important;
+  }
+  /* de afslagenlijst mag over meerdere pagina's lopen */
+  .apex-print-card ol {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  .apex-print-card li {
+    break-inside: avoid;
+  }
+  .apex-print-card svg {
+    color: #a16207 !important;
+  }
+}
+
+/* ---------- 2026 landing-effecten ---------- */
+
+/* aurora-blobs: langzaam drijvende kleurvelden */
+.aurora {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(120px);
+  animation: aurora-drift 20s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+@keyframes aurora-drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(6vw, -5vh, 0) scale(1.18);
+  }
+}
+
+/* filmische korrel over de pagina */
+.grain::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* subtiel raster in de hero, naar beneden wegvallend */
+.grid-bg {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(ellipse 85% 60% at 50% 0%, black 35%, transparent 78%);
+  mask-image: radial-gradient(ellipse 85% 60% at 50% 0%, black 35%, transparent 78%);
+}
+
+/* spotlight-kaarten: glow volgt de muis */
+.spotlight-card {
+  position: relative;
+}
+.spotlight-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    340px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255, 230, 0, 0.1),
+    transparent 65%
+  );
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+.spotlight-card:hover::before {
+  opacity: 1;
+}
+
+/* marquee met zachte randen */
+.marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 12%, black 88%, transparent);
+  mask-image: linear-gradient(90deg, transparent, black 12%, black 88%, transparent);
+}
+.marquee-track {
+  display: flex;
+  gap: 2rem;
+  width: max-content;
+  padding-right: 2rem;
+  animation: marquee-scroll 36s linear infinite;
+}
+@keyframes marquee-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* geanimeerde demoroute op de landing (marcherende streepjes) */
+.apex-demo-route {
+  stroke-dasharray: 16 18;
+  animation: demo-flow 1.3s linear infinite;
+}
+@keyframes demo-flow {
+  to {
+    stroke-dashoffset: -34;
+  }
+}
+
+/* a/b-markers op de demokaart */
+.apex-demo-dot {
+  width: 26px;
+  height: 26px;
+  border-radius: 9999px;
+  background: #050507;
+  border: 2px solid #ffe600;
+  color: #ffe600;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 22px;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora,
+  .marquee-track,
+  .apex-demo-route {
+    animation: none !important;
+  }
+}
+
+/* ---------- verdienmodel & verslavings-laag ---------- */
+
+/* glans over de primaire knop: een lichtstreep die bij hover doorschiet */
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shine::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -80%;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  transform: skewX(-20deg);
+  transition: none;
+  pointer-events: none;
+}
+.btn-shine:hover::after {
+  animation: shine-sweep 0.75s ease forwards;
+}
+@keyframes shine-sweep {
+  to {
+    left: 130%;
+  }
+}
+
+/* gouden Pro-chip (knop in de planner) */
+.pro-chip {
+  background: linear-gradient(135deg, rgba(255, 230, 0, 0.16), rgba(255, 230, 0, 0.05));
+  border: 1px solid rgba(255, 230, 0, 0.45);
+  color: #ffe600;
+  font-weight: 700;
+}
+.pro-chip:hover {
+  border-color: rgba(255, 230, 0, 0.9);
+}
+
+/* gele gloed rond het roulettewiel */
+
+/* Pro-kaart op de landing: langzaam pulserende gouden rand */
+.pro-card {
+  box-shadow: 0 0 50px -18px rgba(255, 230, 0, 0.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-shine::after {
+    display: none;
+  }
+}
+
+/* ---------- demo-rit ---------- */
+
+/* rijdende marker: gele stip met draaiende pijl */
+.apex-ride-dot {
+  width: 34px;
+  height: 34px;
+  border-radius: 9999px;
+  background: #050507;
+  border: 2.5px solid #ffe600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 3px 14px rgba(0, 0, 0, 0.75),
+    0 0 0 6px rgba(255, 230, 0, 0.12);
+}
+.apex-ride-arrow {
+  color: #ffe600;
+  font-size: 15px;
+  line-height: 1;
+  display: inline-block;
+  transition: transform 0.18s linear;
+  margin-top: 1px;
+}
+
+/* afslagbanner tijdens de demo-rit */
+.demo-banner {
+  animation: banner-pop 0.25s ease;
+}
+@keyframes banner-pop {
+  from {
+    transform: translateY(-8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .apex-ride-arrow,
+  .demo-banner {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* ---------- luxe kaders: super-round, layered glow ---------- */
+
+.lux-card {
+  position: relative;
+  border-radius: 28px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.085),
+    rgba(255, 255, 255, 0.028)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 0 26px rgba(255, 255, 255, 0.02),
+    0 30px 60px -25px rgba(0, 0, 0, 0.85),
+    0 8px 24px -12px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  transition:
+    transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
+}
+.lux-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 230, 0, 0.35);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 36px 80px -28px rgba(0, 0, 0, 0.9),
+    0 0 0 1px rgba(255, 230, 0, 0.12),
+    0 0 46px -12px rgba(255, 230, 0, 0.22);
+}
+
+/* 3D-tilt met glare voor afbeeldingskaarten */
+.tilt-wrap {
+  perspective: 950px;
+}
+.tilt-card {
+  transform-style: preserve-3d;
+  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
+}
+.tilt-glare {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    320px circle at var(--gx, 50%) var(--gy, 50%),
+    rgba(255, 255, 255, 0.22),
+    transparent 60%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 5;
+}
+.tilt-card:hover .tilt-glare {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lux-card,
+  .tilt-card {
+    transition: none;
+  }
+  .lux-card:hover {
+    transform: none;
+  }
+  .tilt-card:hover {
+    transform: none !important;
+  }
+}
+
+/* ---------- 2026-visielaag: foto-bento, route-animaties, topo-voeter ---------- */
+
+/* getekende routelijn (SVG) die zichzelf tekent bij in beeld komen */
+.route-draw {
+  stroke-dasharray: 320;
+  stroke-dashoffset: 320;
+  animation: route-draw 2.6s cubic-bezier(0.4, 0.1, 0.2, 1) 0.25s forwards;
+}
+@keyframes route-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* pulserende POI-stippen op de mini-kaart */
+.poi-dot {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: poi-dot 2.6s ease-in-out infinite;
+}
+@keyframes poi-dot {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.55);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* typende chat-bubbels */
+.typing-dot {
+  animation: typing-dot 1.3s ease-in-out infinite;
+}
+@keyframes typing-dot {
+  0%,
+  60%,
+  100% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+/* topo-contouren in de voeter: subtiele hoogtelijnen */
+.topo-lines {
+  background-image: repeating-radial-gradient(
+      circle at 12% 130%,
+      transparent 0,
+      transparent 88px,
+      rgba(255, 230, 0, 0.05) 89px,
+      transparent 91px
+    ),
+    repeating-radial-gradient(
+      circle at 88% -30%,
+      transparent 0,
+      transparent 110px,
+      rgba(255, 255, 255, 0.035) 111px,
+      transparent 113px
+    );
+}
+
+/* scroll-voortgangsbalk bovenin de pagina */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2.5px;
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, #ffe600, #ff9d00, #ffe600);
+  z-index: 60;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-draw {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+  .poi-dot,
+  .typing-dot {
+    animation: none;
+  }
+}
+
+/* ============================================================
+   NIGHTDRIVE v4 — de thema-laag over heel de site
+   Asfalt-zwart · natriumlicht-goud · hairlines · mono-labels
+   ============================================================ */
+
+:root {
+  --gold-100: #fff7c2;
+  --gold-500: #ffe600;
+  --gold-600: #ffb300;
+  --ink: #050507;
+}
+
+/* filmische basis: koele diepte onderin, warm licht bovenin */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 70% at 50% -10%, rgba(255, 214, 10, 0.05), transparent 60%),
+    radial-gradient(90% 50% at 50% 115%, rgba(20, 24, 40, 0.35), transparent 65%);
+}
+
+/* kop-typografie: strakker, groter, zelfverzekerder */
+h1,
+h2 {
+  letter-spacing: -0.035em;
+}
+.font-display {
+  letter-spacing: -0.02em;
+}
+
+/* mono-eyebrow: het signatuur-label boven elke sectie */
+.eyebrow {
+  font-family: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(255, 230, 0, 0.85);
+}
+
+/* goud-shimmer in gradient-tekst */
+.text-gradient {
+  background: linear-gradient(100deg, #fff7c2 0%, #ffe600 35%, #ffb300 70%, #ffe600 100%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gradient-pan 7s ease-in-out infinite;
+}
+@keyframes gradient-pan {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* glas v2: dieper, zachter, met hairline bovenaan */
+.glass {
+  background: linear-gradient(180deg, rgba(16, 16, 18, 0.88), rgba(9, 9, 11, 0.92));
+  backdrop-filter: blur(16px) saturate(1.15);
+  -webkit-backdrop-filter: blur(16px) saturate(1.15);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+/* zwevende site-nav: één vorm voor elke pagina */
+.site-nav {
+  border-radius: 18px;
+  margin-top: 12px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 18px 44px -22px rgba(0, 0, 0, 0.9);
+}
+
+/* knoppen: gegolde druk, licht gezweng onder drag */
+.btn-brand {
+  background: linear-gradient(135deg, #ffe600 0%, #ffb300 100%);
+  color: #0a0a0c;
+  font-weight: 700;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.45) inset,
+    0 12px 34px -10px rgba(255, 190, 0, 0.5);
+  transition: filter 0.18s ease, transform 0.14s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.18s ease;
+}
+.btn-brand:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.5) inset,
+    0 18px 48px -12px rgba(255, 190, 0, 0.62);
+}
+.btn-brand:active {
+  transform: translateY(0) scale(0.985);
+}
+
+.btn-ghost {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  color: #f0f0f0;
+  transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease, transform 0.14s ease;
+}
+.btn-ghost:hover {
+  border-color: rgba(255, 230, 0, 0.65);
+  color: #ffe600;
+  background: rgba(255, 230, 0, 0.06);
+}
+
+/* kolf-gouden rand rond lux-kaarten bij hover */
+.lux-card {
+  border-radius: 24px;
+}
+
+/* scrollbar in thema */
+* {
+  scrollbar-color: #2e2e33 transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: #26262b;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: #3d3d44;
+  background-clip: padding-box;
+  border: 2px solid transparent;
+}
+
+::selection {
+  background: rgba(255, 182, 0, 0.9);
+  color: #0a0a0c;
+}
+
+/* koplamp: langzaam vegende lichtbundel (hero) */
+.headlight {
+  position: absolute;
+  top: -30%;
+  left: -20%;
+  width: 65%;
+  height: 160%;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(255, 230, 0, 0.06) 35%,
+    rgba(255, 240, 180, 0.1) 50%,
+    rgba(255, 230, 0, 0.06) 65%,
+    transparent 100%
+  );
+  filter: blur(28px);
+  transform: rotate(14deg);
+  animation: headlight-pan 11s ease-in-out infinite alternate;
+  mix-blend-mode: screen;
+}
+@keyframes headlight-pan {
+  from {
+    transform: rotate(14deg) translateX(-12%);
+  }
+  to {
+    transform: rotate(14deg) translateX(150%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .text-gradient {
+    animation: none;
+    background-position: 0% 50%;
+  }
+  .headlight {
+    animation: none;
+    opacity: 0;
+  }
+  .btn-brand,
+  .btn-ghost {
+    transition: none;
+  }
+}
+
+/* ============================================================
+   APEX GRID v5 — scherpe, technische jas over NIGHTDRIVE
+   Geen zachte pil-vormen: nauwkeurige radii, hoekmarkeringen,
+   streep-accenten. Professioneel én vermakelijk.
+   ============================================================ */
+
+/* -- scherper radii-systeem: kaarten 12 · knoppen/chips 8 · mini 6 -- */
+.glass {
+  border-radius: 8px;
+}
+.site-nav {
+  border-radius: 12px;
+}
+.lux-card {
+  border-radius: 12px;
+}
+.btn-brand,
+.btn-ghost,
+.pro-chip {
+  border-radius: 8px;
+}
+
+/* hoekmarkeringen: gouden viewfinder-hoeken bij hover (signatuur) */
+.corner-frame {
+  position: relative;
+}
+.corner-frame::before {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  pointer-events: none;
+  z-index: 3;
+  background-image:
+    linear-gradient(#ffe600, #ffe600), linear-gradient(#ffe600, #ffe600),
+    linear-gradient(#ffe600, #ffe600), linear-gradient(#ffe600, #ffe600),
+    linear-gradient(#ffe600, #ffe600), linear-gradient(#ffe600, #ffe600),
+    linear-gradient(#ffe600, #ffe600), linear-gradient(#ffe600, #ffe600);
+  background-repeat: no-repeat;
+  background-size:
+    16px 2px, 2px 16px,
+    16px 2px, 2px 16px,
+    16px 2px, 2px 16px,
+    16px 2px, 2px 16px;
+  background-position:
+    top left, top left,
+    top right, top right,
+    bottom left, bottom left,
+    bottom right, bottom right;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.corner-frame:hover::before {
+  opacity: 0.95;
+}
+
+/* racing-streep: dun diagonaal bandje als accent (Pro, POPULAIR) */
+.stripe-accent {
+  background: repeating-linear-gradient(
+    -45deg,
+    #ffe600 0 9px,
+    #101012 9px 18px
+  );
+}
+
+/* sectiescheiding: haarscherpe hairline met gouden midmarker */
+.rule-mark {
+  position: relative;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+}
+.rule-mark::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5px;
+  height: 5px;
+  rotate: 45deg;
+  background: #ffe600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .corner-frame::before {
+    transition: none;
+    opacity: 0;
+  }
+}
+
+/* ============================================================
+   STARTGRID v6 — het definitieve basisthema
+   Blueprint-raster · vierkante blokken · mono-data · markeer-geel
+   ============================================================ */
+
+/* -- hoeken: 4px, puntgericht; niets "pil" -- */
+.glass,
+.site-nav,
+.lux-card,
+.btn-brand,
+.btn-ghost,
+.pro-chip {
+  border-radius: 4px;
+}
+
+/* -- permanente blueprint-hoeken (viewfinder altijd zichtbaar, feller bij hover) -- */
+.corner-frame::before {
+  inset: 8px;
+  opacity: 0.4;
+  background-size:
+    12px 1.5px, 1.5px 12px,
+    12px 1.5px, 1.5px 12px,
+    12px 1.5px, 1.5px 12px,
+    12px 1.5px, 1.5px 12px;
+  transition: opacity 0.25s ease;
+}
+.corner-frame:hover::before {
+  opacity: 1;
+}
+
+/* -- fijne technische basis: rasterkruizen over de hele pagina -- */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* -- markeerstift-geel voor kernwoorden -- */
+.hl {
+  background: linear-gradient(180deg, transparent 86%, rgba(255, 230, 0, 0.5) 86%);
+  color: inherit;
+  padding: 0 0.06em 0.04em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* -- knoppen: scherpe blokken met schuif-pijl -- */
+.btn-brand,
+.btn-ghost {
+  position: relative;
+  overflow: hidden;
+}
+.btn-brand::after,
+.btn-ghost::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left;
+  background: currentColor;
+  opacity: 0.55;
+  transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.btn-brand:hover::after,
+.btn-ghost:hover::after {
+  transform: scaleX(1);
+}
+
+/* -- data-ticker: mono, hoofdletters, kartelscheiding -- */
+.ticker {
+  font-family: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* alle mono-data netjes uitgelijnd (km, timers, procenten) */
+.font-mono,
+.ticker {
+  font-variant-numeric: tabular-nums;
+}
+
+/* -- raster-achtergrond fijn en kruisend -- */
+.grid-bg {
+  background-size: 28px 28px;
+}
+
+/* -- sectiekoppen: mono-index -- */
+.sec-index {
+  font-family: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: rgba(255, 230, 0, 0.9);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-brand::after,
+  .btn-ghost::after {
+    transition: none;
+    transform: scaleX(0);
+  }
+}
