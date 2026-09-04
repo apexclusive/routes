@@ -27,3 +27,4 @@ public/*.zip
 public/*.bundle
 public/apex-verbeteringen.patch
 public/patch-tekst.html
+.vercel
