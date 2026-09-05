@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Check, Plus, Sparkles, X } from "lucide-react";
 import { BUCKETLIST_SEEDS, progressOf, type BucketItem } from "@/lib/nl";
-import { setPendingPrompt } from "@/lib/filehandoff";
+import { plannerUrl, setPendingPrompt } from "@/lib/filehandoff";
 import { fireConfetti } from "@/lib/confetti";
 
 interface StoredBucket {
@@ -102,7 +102,7 @@ export default function Bucketlist() {
 
   const rideNow = (prompt: string) => {
     setPendingPrompt(prompt);
-    router.push("/?rit=1");
+    router.push(plannerUrl(prompt));
   };
 
   // ring-geometrie

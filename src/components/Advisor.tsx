@@ -27,7 +27,7 @@ import SiteMenu from "./SiteMenu";
 import TiltCard from "./TiltCard";
 import Poll from "./Poll";
 import LangSwitch, { LangNotice } from "./LangSwitch";
-import { setPendingPrompt } from "@/lib/filehandoff";
+import { plannerUrl, setPendingPrompt } from "@/lib/filehandoff";
 import {
   DESTINATIONS,
   CLIMBS,
@@ -61,7 +61,7 @@ export default function Advisor() {
 
   const openRoute = (prompt: string) => {
     setPendingPrompt(prompt);
-    router.push("/?rit=1");
+    router.push(plannerUrl(prompt));
   };
 
   return (
@@ -780,8 +780,8 @@ export default function Advisor() {
           {ADVISOR_FOOTER}
         </p>
         <p className="text-[12px] text-slate-500 mt-3">
-          Steun Apex — elke euro gaat in de allerbeste kaart- en routedata.{" "}
-          <Link href="/#pricing" className="underline underline-offset-2 hover:text-yellow-400">
+          Steun Apex — je bijdrage helpt routingcapaciteit, datakwaliteit en routeonderzoek betalen.{" "}
+          <Link href="/prijzen" className="underline underline-offset-2 hover:text-yellow-400">
             Bekijk de lagen
           </Link>
         </p>

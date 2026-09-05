@@ -10,6 +10,13 @@ import { RITTEN } from "@/lib/ritten";
 import { CLIMBS } from "@/lib/climbs";
 import { bookingSearchUrl } from "@/lib/monetize";
 
+const PARTNER_DISCLOSURE: Record<Lang, string> = {
+  nl: "Partnerlink · Apex kan commissie ontvangen; jouw prijs blijft gelijk.",
+  en: "Partner link · Apex may earn commission; your price stays the same.",
+  fr: "Lien partenaire · Apex peut recevoir une commission, sans surcoût pour vous.",
+  de: "Partnerlink · Apex kann eine Provision erhalten; dein Preis bleibt gleich.",
+};
+
 /**
  * "Rit van de week" — roteert automatisch per week (timestamp/weekmodulus),
  * volledig automatisch dus nooit handmatig onderhouden.
@@ -104,11 +111,17 @@ export default function RotwBand() {
               href={bookingSearchUrl(rit.plaats)}
               target="_blank"
               rel="noopener noreferrer sponsored"
+              data-track="Affiliate klik"
+              data-track-partner="booking"
+              data-track-context="rit-van-de-week"
               className="glass border border-white/10 hover:border-yellow-400/50 px-6 py-3 rounded font-semibold whitespace-nowrap flex items-center gap-2 transition-colors"
             >
               <BedDouble className="w-4 h-4 text-yellow-300" aria-hidden />
               {t.hotel} · {rit.plaats}
             </a>
+            <p className="text-[10px] text-slate-600 max-w-[15rem] leading-snug text-center">
+              {PARTNER_DISCLOSURE[lang]}
+            </p>
             <Link
               href="/ritten"
               className="text-center text-[12px] text-slate-500 hover:text-yellow-400 transition-colors px-2 py-1"

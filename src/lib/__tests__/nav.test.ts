@@ -10,7 +10,7 @@ test("nav:home is de eerste link en elke href is uniek", () => {
 
 test("nav:alle kernsecties zijn bereikbaar vanuit het menu", () => {
   const hrefs = new Set(SITE_LINKS.map((l) => l.href));
-  for (const nodig of ["/", "/ritten", "/klimmen", "/kalender", "/ontdek", "/advies", "/forum", "/ritbank", "/checklist", "/gpx", "/adverteren"]) {
+  for (const nodig of ["/", "/ritten", "/klimmen", "/kalender", "/ontdek", "/advies", "/forum", "/ritbank", "/checklist", "/gpx", "/prijzen", "/adverteren"]) {
     assert.ok(hrefs.has(nodig), `menu mist ${nodig}`);
   }
 });

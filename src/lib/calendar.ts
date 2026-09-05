@@ -27,6 +27,8 @@ export interface CalendarEvent {
   url: string;
   /** prijs/aanmelding in één zin */
   access: string;
+  /** 2027-spiegeldata zijn verwachtingen, nooit als bevestigd presenteren. */
+  dateStatus?: "confirmed" | "expected";
 }
 
 export const EVENT_CATS: { id: EventCat; label: string }[] = [
@@ -192,13 +194,15 @@ export const NEWS: NewsItem[] = [
   },
 ];
 
-/** Jaarweergave: 2026 is de brondataset; 2027 spiegelt de jaarlijkse events (data via de bron checken). */
+/** Jaarweergave: 2027 is uitsluitend een seizoensverwachting totdat de bron bevestigt. */
 export function eventsForYear(year: 2026 | 2027): CalendarEvent[] {
   if (year === 2026) return EVENTS;
   return EVENTS.map((e) => ({
     ...e,
     id: `${e.id}-2027`,
     year: 2027 as const,
-    period: e.period.includes("2026") ? e.period.replace("2026", "2027 (data volgt)") : e.period,
+    dateStatus: "expected" as const,
+    period: `verwacht: ${e.period.replace(/\b2026\b/g, "2027")}`,
+    access: "Nog niet bevestigd — controleer de organisator voor je boekt.",
   }));
 }

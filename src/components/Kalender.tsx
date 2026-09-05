@@ -170,7 +170,7 @@ export default function Kalender() {
       </section>
 
       {/* filters */}
-      <div className="flex gap-1.5 mb-2.5">
+      <div className="flex flex-wrap gap-1.5 mb-2.5">
         {([2026, 2027] as const).map((j) => (
           <button
             key={j}
@@ -184,9 +184,9 @@ export default function Kalender() {
           </button>
         ))}
         <span className="text-[11px] text-slate-500 self-center ml-1">
-          {jaar === 2027 ? "jaarlijkse events gespiegeld — data via de bron checken" : "seizoen 2026"}
+          {jaar === 2027 ? "seizoensverwachting · nog niet bevestigd" : "seizoen 2026"}
         </span>
-        <div className="relative flex-1 min-w-[180px] ml-2">
+        <div className="relative basis-full sm:basis-auto sm:flex-1 min-w-[180px] sm:ml-2 mt-1 sm:mt-0">
           <Search
             className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"
             aria-hidden
@@ -299,6 +299,11 @@ export default function Kalender() {
             );
           })}
         </div>
+        {jaar === 2027 && (
+          <p className="mt-3 glass rounded border border-amber-400/25 px-3.5 py-2.5 text-[12px] text-amber-100/80 leading-relaxed" role="status">
+            <b className="text-amber-200">Voorlopige seizoensspiegel:</b> deze evenementen keren doorgaans terug, maar 2027-data en tickets zijn nog niet bevestigd. Controleer altijd de gelinkte organisator vóór je accommodatie of vervoer boekt.
+          </p>
+        )}
       </section>
 
       {/* events */}
@@ -337,6 +342,9 @@ export default function Kalender() {
                   href={e.url}
                   target="_blank"
                   rel="noopener noreferrer"
+                  data-track="Eventlink geopend"
+                  data-track-audience="toeschouwer"
+                  data-track-country={e.country}
                   initial={{ opacity: 0, y: 12 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-30px" }}
@@ -353,6 +361,9 @@ export default function Kalender() {
                     <p className="text-[11px] text-slate-500 mb-1">
                       {e.place} · {e.period}
                     </p>
+                    {e.dateStatus === "expected" && (
+                      <span className="self-start text-[9px] font-bold uppercase tracking-widest text-amber-200 border border-amber-400/25 rounded px-1.5 py-0.5 mb-2">verwacht</span>
+                    )}
                     <h3 className="font-display font-bold text-[16px] leading-snug mb-2">{e.name}</h3>
                     <p className="text-[13px] text-slate-400 leading-relaxed flex-1">{e.what}</p>
                     <p className="text-[11px] text-yellow-400/80 mt-3 pt-3 border-t border-white/[0.07]">
@@ -486,6 +497,10 @@ export default function Kalender() {
               href={e.url}
               target="_blank"
               rel="noopener noreferrer"
+              data-track="Eventlink geopend"
+              data-track-audience="deelnemer"
+              data-track-category={e.cat}
+              data-track-country={e.country}
               className="h-full flex"
             >
               <TiltCard className="h-full" maxTilt={5}>
@@ -504,6 +519,9 @@ export default function Kalender() {
                   <p className="text-[11px] text-slate-500 mb-1">
                     {e.place} · {EVENT_CATS.find((c) => c.id === e.cat)?.label}
                   </p>
+                  {e.dateStatus === "expected" && (
+                    <span className="self-start text-[9px] font-bold uppercase tracking-widest text-amber-200 border border-amber-400/25 rounded px-1.5 py-0.5 mb-2">verwacht · niet bevestigd</span>
+                  )}
                   <h3 className="font-display font-bold text-[16px] leading-snug mb-2">
                     {e.name}
                   </h3>
@@ -516,14 +534,16 @@ export default function Kalender() {
                 </div>
               </TiltCard>
             </motion.a>
-              <button
-                onClick={() => downloadIcs(e)}
-                title="Herinnering in je agenda (midmaand-indicator) — exacte datum via de organisator"
-                className="mt-2 glass rounded px-3 py-2 text-[12px] font-semibold text-slate-300 hover:text-yellow-300 hover:border-yellow-400/40 transition-colors flex items-center gap-1.5 self-start"
-              >
-                <CalendarPlus className="w-3.5 h-3.5" />
-                In mijn agenda
-              </button>
+              {e.dateStatus !== "expected" && (
+                <button
+                  onClick={() => downloadIcs(e)}
+                  title="Herinnering in je agenda (midmaand-indicator) — exacte datum via de organisator"
+                  className="mt-2 glass rounded px-3 py-2 text-[12px] font-semibold text-slate-300 hover:text-yellow-300 hover:border-yellow-400/40 transition-colors flex items-center gap-1.5 self-start"
+                >
+                  <CalendarPlus className="w-3.5 h-3.5" />
+                  In mijn agenda
+                </button>
+              )}
             </motion.div>
               ))}
             </div>
@@ -598,8 +618,8 @@ export default function Kalender() {
           de site van de organisatie is altijd de bron.
         </p>
         <p className="text-[12px] text-slate-500 mt-3">
-          Steun Apex — elke euro gaat in de allerbeste kaart- en routedata.{" "}
-          <Link href="/#pricing" className="underline underline-offset-2 hover:text-yellow-400">
+          Steun Apex — je bijdrage helpt routingcapaciteit, datakwaliteit en routeonderzoek betalen.{" "}
+          <Link href="/prijzen" className="underline underline-offset-2 hover:text-yellow-400">
             Bekijk de lagen
           </Link>
         </p>

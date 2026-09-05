@@ -389,13 +389,20 @@ export default function Landing({
           </button>
           <button
             onClick={() => setShowPro(true)}
+            data-track="Prijsdialoog geopend"
+            data-track-source="navigatie"
             className="h-10 px-3.5 rounded font-bold text-[13px] flex items-center gap-1.5 pro-chip"
             aria-label="Apex Pro"
           >
             <Crown className="w-4 h-4" />
             <span className="hidden sm:inline">Pro</span>
           </button>
-          <button onClick={onStart} className="btn-brand h-10 px-4 rounded font-semibold text-[13px] hidden sm:block">
+          <button
+            onClick={onStart}
+            data-track="Planner gestart"
+            data-track-source="navigatie"
+            className="btn-brand h-10 px-4 rounded font-semibold text-[13px] hidden sm:block"
+          >
             {t.nav.openApp}
           </button>
           {/* mobiel: menu-knop */}
@@ -451,6 +458,7 @@ export default function Landing({
                   { href: "/gpx", icon: FileDown, label: t.footer.gpx },
                   { href: "/ritten", icon: Route, label: t.footer.ritten },
                   { href: "/klimmen", icon: Mountain, label: t.footer.klimmen },
+                  { href: "/prijzen", icon: Crown, label: "Apex Pro & prijzen" },
                   { href: "/adverteren", icon: Megaphone, label: t.footer.adverteren },
                 ] as const
               ).map(({ href, icon: Icon, label }) => (
@@ -538,6 +546,8 @@ export default function Landing({
           <motion.button
             whileTap={{ scale: 0.96 }}
             onClick={onStart}
+            data-track="Planner gestart"
+            data-track-source="hero"
             className="group inline-flex items-center gap-3 px-8 py-4 btn-brand btn-shine rounded font-semibold text-lg"
           >
             {t.hero.start}
@@ -546,6 +556,8 @@ export default function Landing({
           <motion.button
             whileTap={{ scale: 0.96 }}
             onClick={() => fileRef.current?.click()}
+            data-track="Route import gestart"
+            data-track-source="hero"
             className="inline-flex items-center gap-3 px-8 py-4 btn-ghost rounded font-semibold text-lg"
           >
             <Upload className="w-5 h-5" />
@@ -594,6 +606,8 @@ export default function Landing({
             </span>
             <button
               onClick={onStart}
+              data-track="Planner gestart"
+              data-track-source="kaart-demo"
               className="absolute bottom-5 left-1/2 -translate-x-1/2 z-10 inline-flex items-center gap-2 px-6 py-3 btn-brand rounded font-semibold"
             >
               {t.map.tryLive}
@@ -933,6 +947,8 @@ export default function Landing({
             </ul>
             <button
               onClick={() => setShowPro(true)}
+              data-track="Prijsdialoog geopend"
+              data-track-source="pricing-supporter"
               className="btn-ghost w-full mt-7 px-5 py-3 rounded font-semibold"
             >
               {t.pricing.ctaSupporter}
@@ -969,6 +985,8 @@ export default function Landing({
             </ul>
             <button
               onClick={() => setShowPro(true)}
+              data-track="Prijsdialoog geopend"
+              data-track-source="pricing-pro"
               className="btn-brand btn-shine w-full mt-7 px-5 py-3 rounded font-semibold flex items-center justify-center gap-2"
             >
               <Crown className="w-4 h-4" />
@@ -977,6 +995,12 @@ export default function Landing({
           </motion.div>
         </div>
         <p className="text-center text-[13px] text-slate-500 mt-6">{t.pricing.supportLine}</p>
+        <p className="text-center mt-3">
+          <Link href="/prijzen" className="text-[12px] font-semibold text-yellow-300 hover:text-yellow-200 inline-flex items-center gap-1.5">
+            Vergelijk alle plannen en voorwaarden
+            <ArrowUpRight className="w-3.5 h-3.5" aria-hidden />
+          </Link>
+        </p>
       </section>
 
       {/* slot-cta */}
@@ -1054,7 +1078,7 @@ export default function Landing({
                   </Link>
                 </li>
                 <li>
-                  <Link href="/#pricing" className="text-slate-400 hover:text-yellow-400 transition-colors">
+                  <Link href="/prijzen" className="text-slate-400 hover:text-yellow-400 transition-colors">
                     {t.pricing.titleA} {t.pricing.titleB}
                   </Link>
                 </li>
@@ -1102,6 +1126,7 @@ export default function Landing({
               <ul className="space-y-2.5 text-[14px]">
                 <li><a href="/advies#apps" className="text-slate-400 hover:text-yellow-400 transition-colors">Google Maps · Waze · Kurviger</a></li>
                 <li><a href="/ontdek" className="text-slate-400 hover:text-yellow-400 transition-colors">Zuid-Limburg · Eifel · Alpen</a></li>
+                <li><a href="/adverteren" className="text-slate-400 hover:text-yellow-400 transition-colors">Partners & adverteren</a></li>
                 <li className="text-slate-500 flex items-start gap-1.5">
                   <Leaf className="w-3.5 h-3.5 mt-0.5 text-emerald-400/80 shrink-0" />
                   {t.finalNature}
@@ -1115,7 +1140,9 @@ export default function Landing({
             <p className="text-[12px] text-slate-600 text-center sm:text-left leading-relaxed">
               © 2026 Apex Routes · {t.footer.credits}
             </p>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <Link href="/privacy" className="text-[11px] text-slate-600 hover:text-yellow-300">Privacy</Link>
+              <Link href="/voorwaarden" className="text-[11px] text-slate-600 hover:text-yellow-300">Voorwaarden</Link>
               <span className="text-[12px] text-slate-600">{t.footerBuilt}</span>
               <LangSwitch />
             </div>

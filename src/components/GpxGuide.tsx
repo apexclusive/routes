@@ -24,7 +24,7 @@ import SkipLink from "./SkipLink";
  */
 
 const FORMATS = [
-  { ext: ".gpx", what: "De standaard. Puntenuit GPS-apps en -toestellen.", apps: "Alles: Garmin, OsmAnd, Kurviger, Komoot" },
+  { ext: ".gpx", what: "De gangbare standaard voor routes en tracks uit GPS-apps en -toestellen.", apps: "Veel route-apps, waaronder Garmin, OsmAnd, Kurviger en Komoot" },
   { ext: ".kml", what: "Google Earth-formaat; veel kaartdiensten schrijven het.", apps: "Google Earth, sommige kaarttools" },
   { ext: ".tcx", what: "Garmin Training Center — routes met trainingsdata.", apps: "Garmin Connect, Edge-toestellen" },
   { ext: ".fit", what: "Modern Garmin/Wahoo-formaat, compact en snel.", apps: "Garmin, Wahoo, Sigma" },
@@ -32,30 +32,30 @@ const FORMATS = [
 ];
 
 const EXPORTS = [
-  { app: "Google Maps", best: "Auto & dagtochten", how: "Knop “Google Maps” in de samenvatting — we sturen max 11 slimme ankers mee, exact op de weg (geen POI-omrijden)." },
-  { app: "Waze", best: "Verkeer & meldingen", how: "Zelfde ankers-logica; Waze opent met de punten als tussenstops." },
-  { app: "Kurviger", best: "Motor", how: "Download de GPX (met afslaginstructies) en importeer; of laat Kurviger zelf kronkelen tussen jouw punten." },
+  { app: "Google Maps", best: "Auto & dagtochten", how: "De knop in de samenvatting stuurt start, einde en maximaal negen representatieve tussenpunten mee. Maps berekent zelf het wegverloop." },
+  { app: "Waze", best: "Verkeer & meldingen", how: "Waze opent direct met de eindbestemming; gebruik GPX in een compatibele app als de volledige routevorm belangrijk is." },
+  { app: "Kurviger", best: "Motor", how: "Download en importeer de GPX met routelijn en beschikbare afslagpunten; controleer Kurvigers importpreview vóór vertrek." },
   { app: "OsmAnd", best: "Offline (fiets & wandelen)", how: "GPX importeren; werkt volledig offline met OpenStreetMap-kaarten." },
   { app: "Komoot", best: "Fiets & wandelen", how: "Importeer de GPX als “tour” — Komoot herberekent op paden, check even de voetafdruk." },
-  { app: "Garmin / Wahoo", best: "Op het toestel", how: "GPX of TCX via Garmin Connect / Wahoo Elemnt uploaden en syncen." },
+  { app: "Garmin / Wahoo", best: "Op het toestel", how: "Upload de Apex-GPX via Garmin Connect of de Wahoo ELEMNT-app en controleer de route vóór synchronisatie." },
 ];
 
 const FAQ = [
   {
     q: "Mijn route wordt niet één lijn maar losse punten — nu?",
-    a: "Dat is precies wat map matching oplost: Apex legt je track op het wegenraster en maakt er één doorlopende route van, met echte afslagen. Sleep het bestand op de planner en zie het gebeuren.",
+    a: "Apex probeert de track aan het wegennet te koppelen met de gekozen voertuigmodus. Lukt dat niet betrouwbaar, dan blijft de oorspronkelijke trackvorm behouden en krijg je geen verzonnen afslagen.",
   },
   {
     q: "Waarom max 11 punten voor Google Maps?",
-    a: "Maps knapt URLs met te veel waypoints af en zet ze andersom als POI's neer (met omrij-U-turns als gevolg). Wij kiezen max 11 slimme ankers óp de weg, zodat Maps netjes van punt naar punt navigeert.",
+    a: "Google Maps begrenst het aantal tussenpunten en kan per platform anders reageren. Apex kiest daarom maximaal negen representatieve tussenpunten naast start en einde. Maps herberekent de route; vergelijk die vóór vertrek met je oorspronkelijke track.",
   },
   {
     q: "Werkt importeren ook vanaf mijn telefoon?",
-    a: "Ja: deel het bestand via “openen met” → Apex Routes (PWA), of sleep het in de planner op desktop. Alles gebeurt lokaal — je track verlaat je apparaat niet.",
+    a: "Ja: deel het bestand via “openen met” naar de Apex Routes-PWA, of sleep het in de planner op desktop. Het bestand wordt lokaal gelezen; voor map matching kunnen routecoördinaten via de Apex-API naar de geconfigureerde routingdienst gaan.",
   },
   {
     q: "Welk formaat kan ik het beste bewaren?",
-    a: "GPX 1.1 met tijdspunten als je hem later wilt analyseren; zonder tijden is hij compacter. Onze exports bevatten altijd afslaginstructies (rpt), zodat elke app de route identiek opbouwt.",
+    a: "Bewaar GPX 1.1 met tijdspunten voor latere analyse; zonder tijden blijft het bestand compacter. Een Apex-export bevat de routelijn en, wanneer beschikbaar, afslagpunten. Apps kunnen GPX verschillend interpreteren: controleer de geïmporteerde route vóór vertrek.",
   },
 ];
 
@@ -224,8 +224,8 @@ export default function GpxGuide() {
           </Link>
         </p>
         <p className="text-[12px] text-slate-600 mt-2">
-          Steun Apex — elke euro gaat in de allerbeste kaart- en routedata.{" "}
-          <Link href="/#pricing" className="underline underline-offset-2 hover:text-yellow-400">
+          Steun Apex — je bijdrage helpt routingcapaciteit, datakwaliteit en routeonderzoek betalen.{" "}
+          <Link href="/prijzen" className="underline underline-offset-2 hover:text-yellow-400">
             Bekijk de lagen
           </Link>
         </p>

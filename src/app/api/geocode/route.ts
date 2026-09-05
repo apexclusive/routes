@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 const NOMINATIM_BASE =
   process.env.NOMINATIM_BASE_URL || "https://nominatim.openstreetmap.org";
 
-const UA = "ApexRoutes/1.0 (https://apexroutes.app)";
+const UA = "ApexRoutes/1.0 (https://routes.apexclusive.nl)";
 const TTL = 24 * 60 * 60 * 1000; // 24 u — adressen veranderen zelden
 
 export async function GET(req: NextRequest) {

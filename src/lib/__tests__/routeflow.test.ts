@@ -5,6 +5,7 @@ import {
   isRouteFileName,
   parseRouteFile,
   parseGeoJSON,
+  preserveImportedTrack,
   getGoogleMapsUrl,
 } from "../routing.ts";
 import { buildTurnByTurn, selectNavigationAnchors, nlInstruction, type OSRMStep } from "../navigation.ts";
@@ -55,6 +56,21 @@ test("routeflow:onbruikbare input levert null, geen crash", () => {
   assert.equal(parseRouteFile("dit is gewoon tekst"), null);
   assert.equal(parseGeoJSON("{geen json"), null);
   assert.equal(parseGeoJSON('{"type":"Point","coordinates":[5.6,50.8]}'), null);
+});
+
+test("routeflow:geldige upload behoudt vorm als wegroutering niet lukt", () => {
+  const track = preserveImportedTrack([
+    MAASTRICHT,
+    { lat: 50.86, lng: 5.72 },
+    VALKENBURG,
+  ], "bicycle");
+  assert.ok(track);
+  assert.equal(track.preserved, true);
+  assert.equal(track.estimated, true);
+  assert.deepEqual(track.geometry.coordinates[0], [MAASTRICHT.lng, MAASTRICHT.lat]);
+  assert.deepEqual(track.geometry.coordinates.at(-1), [VALKENBURG.lng, VALKENBURG.lat]);
+  assert.ok(track.distance > 0);
+  assert.ok(track.duration > 0);
 });
 
 /* ---------- 3. turn-by-turn in het Nederlands ---------- */

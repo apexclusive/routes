@@ -311,7 +311,7 @@ export class RouteWizard {
     if (/google maps/.test(norm)) {
       if (this.context.route || this.context.waypoints.length >= 2) {
         return this.assistantMsg(
-          "Geopend in een nieuw tabblad! Gebruik anders de knop **Google Maps** in de route-samenvatting (rechtsboven op de kaart). Voor 100% exacte turn-by-turn (elke bocht) kun je ook de **GPX** downloaden en openen in OsmAnd, Kurviger, Calimoto of TomTom."
+          "Geopend in een nieuw tabblad! Gebruik anders de knop **Google Maps** in de route-samenvatting. Wil je de routevorm meenemen, download dan de **GPX** voor een compatibele app zoals OsmAnd, Kurviger, Calimoto of TomTom. Controleer de import: apps kunnen route- en afslagpunten verschillend interpreteren."
         );
       }
       return this.assistantMsg(

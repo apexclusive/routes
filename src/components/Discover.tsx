@@ -29,14 +29,14 @@ import {
   RALLY_EVENTS,
   DISCOVER_FOOTER,
 } from "@/lib/discover";
-import { setPendingPrompt } from "@/lib/filehandoff";
+import { plannerUrl, setPendingPrompt } from "@/lib/filehandoff";
 
 /** Route openen in de planner: prompt klaarzetten en terug naar de app. */
 function useOpenInPlanner() {
   const router = useRouter();
   return (prompt: string) => {
     setPendingPrompt(prompt);
-    router.push("/?rit=1");
+    router.push(plannerUrl(prompt));
   };
 }
 
@@ -360,8 +360,8 @@ export default function Discover() {
           {DISCOVER_FOOTER}
         </p>
         <p className="text-[12px] text-slate-500 mt-3">
-          Steun Apex — elke euro gaat in de allerbeste kaart- en routedata.{" "}
-          <Link href="/#pricing" className="underline underline-offset-2 hover:text-yellow-400">
+          Steun Apex — je bijdrage helpt routingcapaciteit, datakwaliteit en routeonderzoek betalen.{" "}
+          <Link href="/prijzen" className="underline underline-offset-2 hover:text-yellow-400">
             Bekijk de lagen
           </Link>
         </p>

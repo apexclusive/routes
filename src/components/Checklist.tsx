@@ -391,8 +391,8 @@ export default function Checklist() {
           </Link>
         </p>
         <p className="text-[12px] text-slate-600 mt-2">
-          Steun Apex — elke euro gaat in de allerbeste kaart- en routedata.{" "}
-          <Link href="/#pricing" className="underline underline-offset-2 hover:text-yellow-400">
+          Steun Apex — je bijdrage helpt routingcapaciteit, datakwaliteit en routeonderzoek betalen.{" "}
+          <Link href="/prijzen" className="underline underline-offset-2 hover:text-yellow-400">
             Bekijk de lagen
           </Link>
         </p>

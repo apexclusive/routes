@@ -10,8 +10,8 @@ slinger-score en exports naar Google Maps, Waze en GPX (TomTom / Calimoto / Kurv
 ## Snel starten
 
 ```bash
-npm install
-cp .env.example .env   # optioneel — alles werkt ook zonder env-vars
+npm ci
+cp .env.example .env   # optioneel voor lokaal; vereist voor productie-integraties
 npm run dev
 # open http://localhost:3000
 ```
@@ -27,7 +27,7 @@ Lint, typecheck en tests:
 
 ```bash
 npm run lint
-npx tsc --noEmit
+npm exec tsc -- --noEmit
 npm test
 ```
 
@@ -87,7 +87,7 @@ op de pagina te slepen (drag & drop) én via de knop; export weer als GPX.
   circuits (Zolder, Zandvoort, Assen, Spa, Nürburgring) en de rally's (StreetGasm, CC Rally,
   Limburgs Mooiste…) met bronvermelding: hun GPX sleep je zo de planner in.
 - 💬 **Feedback-bord** — stemmen op de roadmap en eigen ideeën (lokaal + kopieerbaar).
-- 📊 **Peilingen** — poll-component met direct zichtbare uitslag (home, Advisor).
+- 📊 **Peilingen** — eerlijke apparaat-lokale keuze (geen verzonnen publiektotalen).
 - 📖 **[Apex Advisor](/advies)** — bestemmingengidsen met geschiedenis (Mergellandroute
   1963, B500 uit 1930/1952), klimtabel NL (Cauberg 13,2%), APK/DOT-bandencheck,
   pech-alarmnummers (112/ANWB), hotel- en app-tips en de meetings-kalender.
@@ -107,33 +107,34 @@ op de pagina te slepen (drag & drop) én via de knop; export weer als GPX.
 - 🏆 **De Garage** — statistieken (km, regio's, kronkelfactor) en badges over al je
   opgeslagen routes; nieuwe badge = confetti. Alles lokaal, geen account.
 - ✦ **Apex Pro (freemium)** — basis gratis en volledig bruikbaar; gratis gebruikers
-  hebben per dag 3 AI-routes en 5 exports, Pro is onbeperkt. Activeren met een code
-  (demo: `APEXPRO`) of via een Stripe-betaallink (`NEXT_PUBLIC_STRIPE_LINK`).
+  hebben per dag 3 AI-routes en 5 GPX-downloads, Pro is onbeperkt. Productie-aankopen
+  lopen via een server-side Stripe Checkout-sessie en worden bij terugkomst geverifieerd.
 - 🚗 **Voertuig kiezen** (auto / motor / fiets / wandelen) — de export naar Google Maps
   gebruikt het juiste reismodel (`driving` / `bicycling` / `walking`). Met een
   `ORS_API_KEY` krijgen fiets en wandelen echte routing in plaats van een schatting.
 - 🚫 **Vermijd snelwegen** via instellingen (OSRM `exclude=highways`).
 - 📏 **Slinger-score** die aangeeft hoe kronkelig je route is.
 - 🔗 **Exporteren** naar Google Maps, Waze en GPX.
-- ✨ **Geen account nodig** — alles werkt client-side, routes blijven lokaal in
-  je eigen browser.
+- ✨ **Geen account nodig** — opgeslagen routes en voorkeuren blijven lokaal in
+  je browser; routingrequests lopen via begrensde server-API’s naar de ingestelde provider.
 - 📴 **Offline-fallback** — zijn OSRM/Nominatim onbereikbaar, dan schat de app de
   route in (hemelsbrede lijn met wegenfactor) zodat de UI nooit leeg blijft.
 
 > **Waarom niet élke bocht in Google Maps?** De gratis Google Maps URL-API accepteert
 > max ±9 tussenankers. Echte eigen turn-by-turn in de Google Maps-app vereist hun
-> betaalde Navigation SDK (native app). Apex Routes kiest daarom de optimale ankers
-> voor Google én levert een exacte GPX met afslagen voor apps die tracks volgen.
+> betaalde Navigation SDK (native app). Apex Routes kiest daarom representatieve ankers
+> voor Google en levert een standaard-GPX met routelijn en beschikbare afslagpunten.
+> Navigatie-apps kunnen die GPX verschillend interpreteren; controleer de import.
 
 ## Meertalig, lidmaatschap & vindbaarheid (taak 11)
 - **Talen**: NL (standaard) · EN · FR · DE — pill rechtsboven op de landing én alle gids-pagina's; voorkeur in `localStorage` (`apex-routes:lang`); chat-placeholder meertalig; gids-pagina's tonen buiten NL een "deze gids is nog Nederlands"-hint.
-- **Lidmaatschap in drie lagen**: Basis gratis (3 AI-routes + 5 exports/dag) · Supporter €2,99/maand (10 + 15, ♥-badge) · Pro €5,99/maand · €39/jaar · €99 lifetime (alles onbeperkt). **Proefmaand**: code `APEXPROEF` of `APEXPROEFMAAND` → 30 dagen volledig Pro, daarna automatisch terug naar Basis. De steun-boodschap is overal hetzelfde: elke euro gaat naar inkoop van de beste kaart- en routedata en diepere route-research (ProDialog, landingspricing en limiet-meldingen in de planner).
+- **Lidmaatschap in drie lagen**: Basis gratis (3 AI-routes + 5 GPX-downloads/dag) · Supporter €2,99/maand (10 + 15 GPX-downloads) · Pro €5,99/maand · €39/jaar · €99 lifetime (alles onbeperkt). Checkout en periodieke statuscontrole lopen server-side via Stripe. Publieke demo-codes staan in productie uit, tenzij een preview ze expliciet activeert.
 - **AI/Google-vindbaarheid**: `public/llms.txt` voor ChatGPT/Claude/Perplexity (wat de site doet, pagina's, data en bronnen), `src/app/sitemap.ts` met prioriteiten, `robots.ts` → sitemap, en JSON-LD `WebSite`-schema in `layout.tsx`.
 - **App-keuzegids** (Advisor §09): welke navigatie-app waarvoor — auto → Google Maps/Waze, motor → Kurviger/Calimoto, fiets → Komoot/OsmAnd, wandelen → Komoot/AllTrails — met per profiel hoe Apex daarop aansluit (slimme ankers, GPX met afslagen).
 
 ## Forum, account & topo-kaart (taak 11+, "ga door tot je niets meer kunt bedenken")
 - **Apex Forum** (`/forum`): community voor rijders/fietsers/wandelaars — 6 rubrieken, hartjes, foto's bij berichten, team-startdraaden. Lokaal-eerst (`localStorage` `apex-routes:forum`); een gesprek delen = link (volledig gesprek in de URL-hash, foto's blijven buiten de link). Verwerkt gedeelde links via `#f=…` met import-knop.
-- **Account + registratie**: bij activeren van een proefcode (`APEXPROEF`) vraagt het lidmaatschapsvenster eerst naam + e-mail (licht account, `apex-routes:account`, geen wachtwoord); de proefmaand blijft daaraan gekoppeld en je naam staat klaar op het forum. Eerlijk vermeld: sync komt met de latere server.
+- **Lokaal profiel**: een optioneel naam/e-mailprofiel (`apex-routes:account`, geen wachtwoord) blijft in de browser en kan checkoutvelden vooraf invullen. Dit is nadrukkelijk geen gesynchroniseerd serveraccount.
 - **Topo-kaartlaag**: derde stijl in de planner naast Kaart/Satelliet — Esri World Topo Map (sleutelvrij, terreinschaduw, attribution in de kaart) met automatische fallback. OpenTopoMap is geschrapt: die serveert bij drukte "API key required"-tegels.
 - **Steun-boodschap** nu ook in de voetsters van Atlas, Advisor, Kalender en Ritbank (link naar `/#pricing`), en de slot-CTA draagt de regel "Geniet van de natuur en ga erop uit" in vier talen.
 
@@ -299,7 +300,7 @@ Research bij de topsites (Kurviger, Calimoto, REVER, Komoot, RideWithGPS) en de 
 - **Deel-afbeelding** (REVER-stijl): social-card 1200x630 in STARTGRID-stijl (blueprint-raster, gele routelijn met gloed, start/eind-markers, km + kronkel-score + branding) als PNG-download; geometrie-normalisatie puur en getest (lib/sharecard.ts, 3 tests, 229 totaal).
 - sw v35; lint 0, build groen.
 ## Ronde 25: verdienmodel uitgebouwd (v6.26)
-- **Per-plan Stripe-checkout** (`lib/monetize.ts`): elke plankaart in het Pro-dialoog krijgt zijn eigen "Betaal"-knop zodra `NEXT_PUBLIC_STRIPE_LINK_SUPPORTER/_MONTH/_YEAR/_LIFE` (of fallback `NEXT_PUBLIC_STRIPE_LINK`) in Vercel staat — zonder links blijft de code-activatie werken. 3 tests (per-plan wint van fallback, leeg zonder config).
+- **Per-plan checkout (historisch, inmiddels aangescherpt)**: de eerste versie gebruikte statische Stripe-links. De huidige implementatie maakt uitsluitend server-side Checkout Sessions die aan een anonieme installatie zijn gekoppeld; zo wordt nooit betaald zonder verifieerbaar entitlement.
 - **Hotel-affiliate**: knop "Hotel voor deze rit" in de planner zoekt op Booking.com bij de eindbestemming; met `NEXT_PUBLIC_BOOKING_AID` in Vercel rijdt de partner-id automatisch mee (getest).
 - **Conversie-drivers**: deel-afbeelding toont bij de gratis laag een subtiele regel ("Supporters delen zonder deze regel") en bij Pro een PRO-chip; Ritbank-posts van leden krijgen een PRO-chip naast de naam.
 - Inkomstenstromen nu: lidmaatschappen (3 tiers + proefmaand), hotelcommissie, kaartjes-doorverwijzing (kalender, roadmap: eigen verkoop), later partner-events/witte-label.
@@ -328,6 +329,43 @@ Research bij de topsites (Kurviger, Calimoto, REVER, Komoot, RideWithGPS) en de 
 - **Seizoensdata** voor alle 28 klimmen en 10 ritten (indicatief): wintergesloten Alpenpassen (Galibier, Tourmalet, Stelvio, Grossglockner, Timmelsjoch...), kasseien-waarschuwingen, Moezel-wijnoogst-drukte. Zichtbaar als chip (klim) en tile "Beste periode" (rit) — data die bezoekers nergens anders in één oogopslag vinden.
 - **Veelgestelde vragen + FAQPage-schema** op alle 38 detailpagina's: volledig data-gedrive­n gegenereerd (lib/faq.ts: steilheid, lengte/hm, oppervlakte, tol, opening, overnachten) — geen handmatig onderhoud, 4 nieuwe tests (253) bewaken vorm en volledigheid. Vouwbare <details>-sectie in merkhuisstijl; JSON-LD maakt ze kandidaat voor rich snippets in Google.
 - **Deelkaart-knop** op rit- en klimdetail: genereert client-side een 1080×1080 PNG in merkhuisstijl (raster, gele gloed, stats-blokjes, "PLAN DEZE RIT"-badge) — downloadbaar voor Instagram/WhatsApp-status: mond-tot-mond met het merk erop. sw v42.
+## Productie-integraties
+
+De kernplanner werkt zonder commerciële sleutels. Voor een productie-uitrol staan alle
+variabelen gedocumenteerd in [`.env.example`](.env.example). Vul vóór verkoop ook de
+juridische exploitantgegevens (`LEGAL_*`) in; die verschijnen op de juridische
+pagina’s. `/herroepen` biedt consumenten een online herroepingsfunctie zonder account.
+
+- **Stripe**: `STRIPE_SECRET_KEY`, vier `STRIPE_PRICE_*`-ids en
+  `STRIPE_WEBHOOK_SECRET`. Registreer `/api/billing/webhook` voor
+  `checkout.session.completed`, `checkout.session.async_payment_succeeded`,
+  `checkout.session.async_payment_failed`, `charge.refunded`,
+  `charge.dispute.created`, `invoice.payment_failed`,
+  `customer.subscription.updated` en `customer.subscription.deleted`.
+  Prijsselectie maakt server-side Checkout Sessions; de browser activeert nooit een
+  plan zonder serververificatie en controleert de abonnementsstatus periodiek opnieuw.
+  Productie-checkout blijft bewust dicht zolang `LEGAL_NAME`, `LEGAL_ADDRESS`,
+  `LEGAL_REGISTRATION`, Resend en het webhooksecret ontbreken: er wordt geen geld
+  aangenomen voordat identiteit, ontvangstbevestiging en lifecycle-opvolging werken.
+- **E-mail**: `RESEND_API_KEY`, een geverifieerde `RESEND_FROM` en ontvangers voor
+  partner-, feedback-, billing- en herroepingsmails (`WITHDRAWAL_EMAIL_TO`). Zonder
+  Resend toont de UI een expliciete mailto-fallback; een aanvraag wordt nooit als
+  verzonden voorgesteld als dat niet zo is. Voor productie is Resend nodig om na een
+  online herroeping direct een ontvangstbevestiging per e-mail te leveren.
+- **Analytics**: `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` laadt optioneel cookieloze
+  funnelmeting. Maak in Plausible custom goals voor `Planner gestart`,
+  `Route berekend`, `Route geëxporteerd`, `Checkout gestart`, `Aankoop bevestigd`
+  (met revenue), `Affiliate klik` en
+  `Partnerlead verstuurd`. Vrije routeopdrachten, coördinaten, namen en e-mail gaan
+  niet mee als analytics-eigenschap.
+- **Affiliate**: gebruik uitsluitend je toegekende Booking.com `aid` en
+  GetYourGuide Partner-ID. Contextuele links bevatten altijd een zichtbare
+  commissie-disclosure en `rel="sponsored"`.
+
+De ingebouwde burstlimiter beschermt één warme serverinstantie. Gebruik bij
+horizontaal geschaald productieverkeer een gedeelde limiter (bijvoorbeeld Redis/KV)
+voor wereldwijd consistente quota.
+
 ## Techniek
 
 - [Next.js 16](https://nextjs.org) (App Router) + React 19 + TypeScript

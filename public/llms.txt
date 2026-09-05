@@ -1,38 +1,41 @@
 # Apex Routes — llms.txt
 
-> AI-routeplanner voor motor, auto, fiets en wandelen in de Benelux, Duitsland en de Alpen. Beschrijf een rit in gewone taal, importeer GPX/KML/TCX/FIT en krijg één navigeerbare route over echte wegen met afslaginstructies, hoogtemeters, tankstops en weer.
+> Slimme routeplanner voor motor, auto, fiets en wandelen. Beschrijf een rit in gewone taal of importeer GPX/KML/TCX/FIT; Apex probeert de route op het wegennet te berekenen en toont duidelijk wanneer alleen een schatting of de oorspronkelijke track beschikbaar is.
 
 ## Wat deze site doet
 - Route plannen via chat in gewone taal (Nederlands; UI ook in EN/FR/DE) — "/" focust het chatveld
 - Routebestanden importeren: GPX, KML, TCX (Garmin), GeoJSON en FIT (Garmin/Wahoo) — via drag & drop of "openen met"
-- Map matching op echte wegen (OSRM), Nederlandse turn-by-turn-instructies en slimme navigatie-ankers voor Google Maps (max 11, exact op de weg)
-- Export naar Google Maps, Waze en GPX (OsmAnd, Kurviger, Calimoto, TomTom, Garmin)
+- Map matching voor auto/motor (OSRM), voertuig-specifieke routing waar geconfigureerd, behoud van de oorspronkelijke track als matching niet betrouwbaar lukt, en representatieve Google Maps-ankers
+- Direct openen in Google Maps of Waze en standaard-GPX downloaden voor compatibele navigatie-apps
 - Demo-rit: virtuele proefrit met afslagbanners en gesproken instructies
 - Route Roulette: draai een verrassingsroute (deterministische seed) met stijl-keuze: Rustig / Mix / Kronkel (regio's gescoord op kronkelfactor)
-- POI-laag: tankstations, laadpalen en uitzichtpunten binnen 2 km van de route (OpenStreetMap/Overpass) + leesbare stops-lijst op afstand, klik vliegt de kaart naar de stop
+- POI-laag: beschikbare OpenStreetMap-resultaten voor tankstations, laadpalen en uitzichtpunten tot 2 km van de route, plus een aanklikbare stops-lijst
 - Weer bij vertrek (Open-Meteo), hoogteprofiel, rit-helpers (omkeren, lus sluiten, volgorde optimaliseren)
 
 ## Belangrijke pagina's
 - / : landingspagina + direct naar de planner
 - /ontdek : top-10-routes per land (NL·BE·LU·DE), circuits, bucketlist
 - /advies : Apex Advisor — bestemmingengidsen met geschiedenis, klimtabel van Nederland, APK/banden-check, pech- en alarmnummers (112, ANWB), hotel- en app-tips
-- /kalender : 52 events incl. het volledige Belgisch rallykampioenschap, NL-rally's, MTB-marathons (NL/BE/LU), marathons, cyclo's, meetings + nieuws · filter op maand, soort én land (NL/BE/LU/DE/FR), chronologisch gegroepeerd, nu-knop, iCal-export per event
-- /ritbank : routes delen via link (de volledige route zit in de URL) + prikbord met foto's + rit-opname met live km/tijd die als verslag op het prikbord landt
+- /kalender : samengestelde kalender met 2026-bronlinks en duidelijk als onbevestigd gemarkeerde 2027-seizoensverwachtingen; filter op maand, soort en land, met iCal-export per event
+- /ritbank : routes heropenen via een link met routegegevens + een apparaat-lokaal prikbord met foto's en rit-opname
 - /forum : community — gesprekken over routes, apps en navigatie; lokaal-eerst, delen via link (gesprek zit in de URL) · live zoeken over titels, regio's en berichten
 - /checklist : interactieve vertrek-checklist per voertuig (motor/auto/fiets/wandelen) — techniek, papieren, uitrusting; eigen items toevoegen (bewaard per voertuig in de browser)
 - /ritten : 10 samengestelde dagritten (Mergellandroute, Ardennen-Ourthe, kasseienklassieker, Eifel/Nordschleife, Sauerland, Moezel, Route des Crêtes, Schwarzwaldhochstraße, Stelvio, Grossglockner) met km/rijtijd/hoogtepunten, plan-knop en hotel-zoeklink; de landing toont er automatisch elke week één als "Rit van de week"; elke rit heeft een eigen detailpagina (/ritten/<id>) met hoogtepunten, klim-chips, plan-knop, hotel-knop en deel-knoppen
 - /klimmen : klimbibliotheek — 28 beklimmingen NL/BE/DE/FR/IT/CH/AT: Benelux-klassiekers (Cauberg, Camerig, Koppenberg, Muur) én Alpen-cols (Alpe d'Huez, Galibier, Tourmalet, Stelvio, Mortirolo, Furka, Grossglockner, Timmelsjoch) met lengte/gem/max/hm, tolweg-vermeldingen en "Plan rit over deze klim"-knop — elke klim heeft ook een eigen detailpagina (/klimmen/<id>) met zwaarte-balk, hotel-zoekknop en kruislinks
-- /adverteren : partnerschappen en adverteren (events, seizoenspartner, hotelcommissie) met direct aanvraagformulier (mailto partners@apexclusive.nl)
-- /gpx : toolpagina over routebestanden — GPX/KML/TCX/FIT/GeoJSON herkennen, importeren en exporteren naar Google Maps (slimme ankers), Waze, Kurviger, OsmAnd, Komoot, Garmin
+- /adverteren : partnerschappen en adverteren (events, seizoenspartner, hotelcommissie) met gevalideerd aanvraagformulier en expliciete e-mailfallback
+- /prijzen : transparante vergelijking van Basis, Supporter en Pro met server-side Stripe Checkout
+- /privacy en /voorwaarden : lokaal-eerst privacybeleid, partnerdisclosure, veiligheid en abonnementsafspraken
+- /herroepen : online herroepingsfunctie zonder account, met directe ontvangstbevestiging en e-mailbevestiging waar beschikbaar
+- /gpx : gids voor GPX/KML/TCX/FIT/GeoJSON, directe handoff naar Google Maps/Waze en GPX-import in compatibele apps
 
 ## Lidmaatschap
-Basis gratis (3 AI-routes en 5 exports per dag) · Supporter €2,99/maand (10/15) · Pro €5,99/maand, €39/jaar of €99 lifetime (onbeperkt, proefmaand gratis). Betalen via Stripe-per-plan links; hotelboeking via de planner brengt commissie op (partner-id via config). Steun wordt geïnvesteerd in betere kaart- en routedata.
+Basis gratis (3 AI-routes en 5 GPX-downloads per dag) · Supporter €2,99/maand (10/15) · Pro €5,99/maand, €39/jaar of €99 lifetime (onbeperkt). Betalen loopt via server-side Stripe Checkout en verificatie; publieke demo-codes zijn in productie uit. Relevante hotel- en activiteitenlinks kunnen herkenbare partnerlinks zijn. Betaalde plannen helpen routingcapaciteit, datakwaliteit en routeonderzoek financieren.
 
 ## Data & bronnen
 Kaarten: CARTO + Esri (basemap incl. topografisch), OpenStreetMap-data via OSRM, Nominatim (geocoding), Overpass (POI's) en Open-Meteo (weer/hoogte). Evenementen-routes van organisaties (StreetGasm, CC Rally, Limburgs Mooiste) worden niet herpubliceerd — we verwijzen naar de bron.
 
 ## Community & accounts
-Het forum en prikbord werken zonder server: alles blijft in de browser en delen gaat via links. Een licht account (naam + e-mail, lokaal) koppelt de gratis proefmaand van Pro.
+Het forum en prikbord werken zonder server: alles blijft in de browser en delen gaat via links. Een optioneel licht profiel (naam + e-mail) blijft lokaal en kan checkoutvelden vooraf invullen; het is geen gesynchroniseerd serveraccount.
 
 ## Talen
 Nederlands (standaard), English, Français, Deutsch — taalknop rechtsboven.

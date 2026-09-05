@@ -158,6 +158,9 @@ test("kalender:2027-spiegel: zelfde aantal, unieke ids, jaar 2027", () => {
   assert.ok(y27.every((e) => e.year === 2027));
   assert.ok(new Set(y27.map((e) => e.id)).size === y27.length);
   assert.ok(y27.every((e) => e.id.endsWith("-2027")));
+  assert.ok(y27.every((e) => e.dateStatus === "expected"));
+  assert.ok(y27.every((e) => e.period.startsWith("verwacht:")));
+  assert.ok(y27.every((e) => e.access.includes("niet bevestigd")));
 });
 
 test("kalender:Duitsland heeft een volle deelnemersagenda (8+)", () => {

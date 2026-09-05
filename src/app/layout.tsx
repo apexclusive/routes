@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import Analytics from "@/components/Analytics";
+import BillingReturn from "@/components/BillingReturn";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -31,6 +33,7 @@ export const metadata: Metadata = {
       "Plan moeiteloos de perfecte route met AI. Kronkelige tochten, scenic uitjes of efficiënte routes.",
     type: "website",
     locale: "nl_NL",
+    url: "/",
     images: [
       {
         url: "/og.jpg",
@@ -117,9 +120,14 @@ export default function RootLayout({
         <link
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
           rel="stylesheet"
+          referrerPolicy="no-referrer"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <Analytics />
+        <BillingReturn />
+      </body>
     </html>
   );
 }

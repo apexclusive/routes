@@ -1,7 +1,7 @@
 /**
  * Apex-lidmaatschappen — eerlijk freemium mét een middenmoot:
  *   Basis (gratis) → Supporter (klein maandelijks) → Pro (onbeperkt).
- * Steun wordt expliciet omgezet in betere data voor iedereen.
+ * Betaalde plannen verruimen limieten en helpen de operationele kosten dragen.
  * Pure logica eerst (goed testbaar), browser-opslag eromheen.
  */
 
@@ -16,6 +16,10 @@ export interface ProState {
   activatedAt: number;
   /** proefmaand: actief tot deze timestamp (ms) */
   trialUntil?: number;
+  source?: "code" | "stripe";
+  /** Checkout-sessie voor periodieke statuscontrole, nooit een betaalkaartgegeven. */
+  sessionId?: string;
+  verifiedAt?: number;
 }
 
 export interface UsageState {
@@ -41,26 +45,31 @@ export const TIER_LIMITS: Record<Tier, Record<UsageKind, number>> = {
 export const FREE_LIMITS = TIER_LIMITS.free;
 
 export const PRO_PLANS: { id: ProPlan; label: string; price: string; note: string }[] = [
-  { id: "supporter", label: "Supporter", price: "€2,99", note: "per maand · houdt de kaart scherp" },
-  { id: "month", label: "Maand", price: "€5,99", note: "per maand · maandelijks opzegbaar" },
-  { id: "year", label: "Jaar", price: "€39", note: "per jaar · twee maanden gratis" },
-  { id: "life", label: "Lifetime", price: "€99", note: "eenmalig · voor altijd" },
+  { id: "supporter", label: "Supporter", price: "€2,99", note: "per maand · ruimere daglimieten" },
+  { id: "month", label: "Maand", price: "€5,99", note: "per maand · flexibel opzegbaar" },
+  { id: "year", label: "Jaar", price: "€39", note: "€3,25 p/m · bespaar €32,88 (46%)" },
+  { id: "life", label: "Lifetime", price: "€99", note: "eenmalig · apparaatmigratie via support" },
 ];
 
 export const PRO_BENEFITS: string[] = [
-  "Onbeperkt AI-routes en GPX/FIT-export per dag",
-  "PDF-routeboek met kaart, hoogteprofiel en afslagen",
-  "Alle toekomstige Pro-regio's en features",
-  "Geen advertenties, ooit",
-  "Je steun laat ons de beste data inkopen: actueel kaartmateriaal, hoogte- en routekwaliteitssets — en diepere research naar de routes die er écht toe doen",
+  "Onbeperkt AI-routes en GPX-downloads per dag",
+  "Deelkaarten in hoge resolutie zonder gratis-laagregel",
+  "Print/PDF-routeboek zonder Basis-footer",
+  "Voorrang bij nieuwe Pro-routefuncties",
+  "Je helpt routingcapaciteit, datakwaliteit en routeresearch financieren",
 ];
 
 export const SUPPORTER_BENEFITS: string[] = [
-  "10 AI-routes en 15 exports per dag",
-  "Alle badges en de Garage, volledig",
-  "Je naam op de Ritbank (binnenkort)",
-  "Je steunt betere data en diepere route-research voor iedereen",
+  "10 AI-routes en 15 GPX-downloads per dag",
+  "Deelkaarten zonder gratis-laagregel",
+  "Zichtbare Supporter-status op dit apparaat",
+  "Je helpt datakwaliteit en route-research financieren",
 ];
+
+/** Publieke demo-codes bestaan nooit stilzwijgend in een productiebuild. */
+export const DEMO_CODES_ENABLED =
+  process.env.NODE_ENV !== "production" ||
+  process.env.NEXT_PUBLIC_ENABLE_DEMO_CODES === "true";
 
 /* ---------- pure logica ---------- */
 
@@ -79,6 +88,7 @@ export interface CodeCheck {
 
 /** Geldige codes: APEXPRO(-JAAR/-MAAND/-LEVEN), APEXSUPPORT(ER), APEXPROEF(MAAND). */
 export function checkCode(code: string): CodeCheck {
+  if (!DEMO_CODES_ENABLED) return { plan: null, trial: false };
   const c = code.trim().toUpperCase();
   for (const { pattern, plan, trial } of CODE_PATTERNS) {
     if (pattern.test(c)) return { plan, trial: Boolean(trial) };
@@ -166,11 +176,41 @@ function writeJson(key: string, value: unknown): void {
 }
 
 const VALID_PLANS = new Set(PRO_PLANS.map((p) => p.id));
+const VALID_SESSION_ID = /^cs_[a-zA-Z0-9_]{8,196}$/;
 
 export function getProState(): ProState {
   const raw = readJson(PRO_KEY) as Partial<ProState> | null;
-  if (raw && raw.active === true && typeof raw.code === "string") {
+  if (raw && typeof raw.active === "boolean" && typeof raw.code === "string") {
     const plan = VALID_PLANS.has(raw.plan as ProPlan) ? (raw.plan as ProPlan) : "year";
+    const stripeSessionId =
+      raw.source === "stripe" &&
+      typeof raw.sessionId === "string" &&
+      VALID_SESSION_ID.test(raw.sessionId)
+        ? raw.sessionId
+        : undefined;
+    if (raw.active !== true) {
+      if (stripeSessionId) {
+        return {
+          active: false,
+          plan,
+          code: "",
+          activatedAt: typeof raw.activatedAt === "number" ? raw.activatedAt : 0,
+          source: "stripe",
+          sessionId: stripeSessionId,
+          verifiedAt: typeof raw.verifiedAt === "number" ? raw.verifiedAt : undefined,
+        };
+      }
+      return { active: false, plan, code: "", activatedAt: 0 };
+    }
+    // Publieke/demo-codes mogen nooit via handmatig aangepaste browseropslag
+    // terugkeren in productie. Stripe-status vereist minimaal een geldige,
+    // begrensde Checkout-sessie en wordt periodiek server-side herbevestigd.
+    if (
+      (raw.source === "stripe" && !stripeSessionId) ||
+      (raw.source !== "stripe" && !DEMO_CODES_ENABLED)
+    ) {
+      return { active: false, plan, code: "", activatedAt: 0 };
+    }
     const trialUntil = typeof raw.trialUntil === "number" ? raw.trialUntil : undefined;
     // verlopen proefmaand = niet meer actief
     if (trialUntil !== undefined && trialUntil < Date.now()) {
@@ -182,6 +222,12 @@ export function getProState(): ProState {
       code: raw.code,
       activatedAt: raw.activatedAt ?? Date.now(),
       trialUntil,
+      source: raw.source === "stripe" ? "stripe" : "code",
+      sessionId: stripeSessionId,
+      verifiedAt:
+        raw.source === "stripe" && typeof raw.verifiedAt === "number"
+          ? raw.verifiedAt
+          : undefined,
     };
   }
   return { active: false, plan: "year", code: "", activatedAt: 0 };
@@ -216,9 +262,43 @@ export function activatePro(code: string): { ok: boolean; plan: ProPlan | null; 
     code: code.trim().toUpperCase(),
     activatedAt: Date.now(),
     trialUntil: trial ? Date.now() + TRIAL_DAYS * 86400000 : undefined,
+    source: "code",
   };
   writeJson(PRO_KEY, state);
   return { ok: true, plan, trial };
+}
+
+export function activateVerifiedPlan(entitlement: {
+  plan: ProPlan;
+  sessionId: string;
+  verifiedAt: number;
+}): ProState {
+  const existing = getProState();
+  const state: ProState = {
+    active: true,
+    plan: entitlement.plan,
+    code: "",
+    activatedAt:
+      existing.source === "stripe" && existing.sessionId === entitlement.sessionId
+        ? existing.activatedAt
+        : entitlement.verifiedAt,
+    source: "stripe",
+    sessionId: entitlement.sessionId,
+    verifiedAt: entitlement.verifiedAt,
+  };
+  writeJson(PRO_KEY, state);
+  return state;
+}
+
+export function suspendVerifiedPlan(): ProState {
+  const existing = getProState();
+  if (existing.source !== "stripe" || !existing.sessionId) {
+    deactivatePro();
+    return getProState();
+  }
+  const state: ProState = { ...existing, active: false, code: "", verifiedAt: Date.now() };
+  writeJson(PRO_KEY, state);
+  return state;
 }
 
 export function deactivatePro(): void {

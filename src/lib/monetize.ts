@@ -1,50 +1,98 @@
 /**
- * Verdienmodel-hub: Stripe-betaallinks per plan, partner-links (hotels) en
- * helper-logica. Puur en alias-vrij — testbaar in node.
+ * Verdienmodel-hub: checkout, relevante reispartners en lead-validatie.
+ * Puur en alias-vrij zodat URL's en bedragen buiten de browser te testen zijn.
  *
- * Configuratie via Vercel-dashboard (NEXT_PUBLIC_-vars), nooit via de chat:
- * - NEXT_PUBLIC_STRIPE_LINK_SUPPORTER / _MONTH / _YEAR / _LIFE (per plan)
- * - NEXT_PUBLIC_STRIPE_LINK (fallback voor alle plannen)
- * - NEXT_PUBLIC_BOOKING_AID (Booking.com partner-id voor hotelboekingen)
+ * Configuratie gebeurt uitsluitend via deployment-variabelen:
+ * - NEXT_PUBLIC_BOOKING_AID
+ * - NEXT_PUBLIC_GETYOURGUIDE_PARTNER_ID
+ * Betalingen staan bewust in lib/billing: statische links zijn geen veilig
+ * entitlementmechanisme.
  */
-
-import type { ProPlan } from "./pro.ts";
 
 const ENV = (typeof process !== "undefined" ? process.env : undefined) ?? {};
 
-/** Stripe-betaallink per plan; lege string = nog niet geconfigureerd. */
-export function checkoutUrl(plan: ProPlan | "supporter"): string {
-  const key =
-    plan === "supporter"
-      ? "NEXT_PUBLIC_STRIPE_LINK_SUPPORTER"
-      : `NEXT_PUBLIC_STRIPE_LINK_${plan.toUpperCase()}`;
-  return (
-    (ENV as Record<string, string | undefined>)[key] ||
-    (ENV as Record<string, string | undefined>).NEXT_PUBLIC_STRIPE_LINK ||
-    ""
-  );
+export interface BookingOptions {
+  checkin?: string;
+  checkout?: string;
+  adults?: number;
+  rooms?: number;
 }
 
-/** Zoek-URL voor een hotel in de buurt van een plaats (Booking.com). */
-export function bookingSearchUrl(place: string): string {
-  const clean = place.trim().split("(")[0].trim();
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+function cleanPlace(place: string): string {
+  return place.trim().split("(")[0].trim().slice(0, 100) || "Maastricht";
+}
+
+/** Zoek-URL voor een verblijf, inclusief bruikbare data en affiliate-id. */
+export function bookingSearchUrl(place: string, options: BookingOptions = {}): string {
   const params = new URLSearchParams({
-    ss: clean || "Maastricht",
+    ss: cleanPlace(place),
     lang: "nl",
   });
+  if (
+    options.checkin &&
+    options.checkout &&
+    ISO_DATE.test(options.checkin) &&
+    ISO_DATE.test(options.checkout) &&
+    options.checkout > options.checkin
+  ) {
+    params.set("checkin", options.checkin);
+    params.set("checkout", options.checkout);
+  }
+  if (options.adults !== undefined) {
+    params.set("group_adults", String(Math.min(10, Math.max(1, Math.round(options.adults)))));
+  }
+  if (options.rooms !== undefined) {
+    params.set("no_rooms", String(Math.min(5, Math.max(1, Math.round(options.rooms)))));
+  }
   const aid = (ENV as Record<string, string | undefined>).NEXT_PUBLIC_BOOKING_AID;
   if (aid) params.set("aid", aid);
   return `https://www.booking.com/searchresults.html?${params.toString()}`;
 }
 
-/** true als er minstens één betaallink geconfigureerd is. */
-export function anyCheckoutConfigured(): boolean {
-  return ["supporter", "month", "year", "life"].some(
-    (p) => checkoutUrl(p as ProPlan | "supporter") !== ""
+/**
+ * Relevante activiteiten rondom een bestemming. GetYourGuide schrijft voor
+ * dat handmatige deep links de eigen Partner ID meekrijgen.
+ */
+export function experienceSearchUrl(place: string): string {
+  const params = new URLSearchParams({ q: cleanPlace(place) });
+  const partnerId = (ENV as Record<string, string | undefined>)
+    .NEXT_PUBLIC_GETYOURGUIDE_PARTNER_ID;
+  if (partnerId) {
+    params.set("partner_id", partnerId);
+    params.set("utm_medium", "online_publisher");
+    params.set("utm_source", "apex_routes");
+  }
+  return `https://www.getyourguide.com/s/?${params.toString()}`;
+}
+
+export function localIsoDate(value: Date): string {
+  const y = value.getFullYear();
+  const m = String(value.getMonth() + 1).padStart(2, "0");
+  const d = String(value.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+/** Eerstvolgende vrijdag vanaf twee weken vooruit, standaard twee nachten. */
+export function defaultTravelDates(now = new Date()): { checkin: string; checkout: string } {
+  const start = new Date(now);
+  start.setHours(12, 0, 0, 0);
+  start.setDate(start.getDate() + 14);
+  start.setDate(start.getDate() + ((5 - start.getDay() + 7) % 7));
+  const end = new Date(start);
+  end.setDate(end.getDate() + 2);
+  return { checkin: localIsoDate(start), checkout: localIsoDate(end) };
+}
+
+export function affiliateDisclosureNeeded(): boolean {
+  const values = ENV as Record<string, string | undefined>;
+  return Boolean(
+    values.NEXT_PUBLIC_BOOKING_AID || values.NEXT_PUBLIC_GETYOURGUIDE_PARTNER_ID
   );
 }
 
-/** Mailto voor partner-aanvragen (zero-backend lead-capture). */
+/** Mailto voor partner-aanvragen (fallback als de mail-API niet is ingericht). */
 export function buildPartnerMailto(
   bedrijf: string,
   email: string,
@@ -60,4 +108,33 @@ export function buildPartnerMailto(
     bericht.trim(),
   ].join("\n");
   return `mailto:partners@apexclusive.nl?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+export const PARTNER_PACKAGES = [
+  "Event-promotie",
+  "Partner van het seizoen",
+  "Hotel- & horecapartner",
+  "Anders / maatwerk",
+] as const;
+
+export type PartnerPackage = (typeof PARTNER_PACKAGES)[number];
+
+export interface PartnerLead {
+  bedrijf: string;
+  email: string;
+  pakket: PartnerPackage;
+  bericht: string;
+}
+
+/** Server/client delen exact dezelfde begrenzing voor een partnerlead. */
+export function validatePartnerLead(value: unknown): PartnerLead | null {
+  if (!value || typeof value !== "object") return null;
+  const raw = value as Partial<PartnerLead>;
+  const bedrijf = String(raw.bedrijf || "").trim().replace(/\s+/g, " ").slice(0, 100);
+  const email = String(raw.email || "").trim().toLowerCase().slice(0, 160);
+  const pakket = String(raw.pakket || "").trim();
+  const bericht = String(raw.bericht || "").trim().slice(0, 2_000);
+  if (bedrijf.length < 2 || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return null;
+  if (!PARTNER_PACKAGES.includes(pakket as PartnerPackage)) return null;
+  return { bedrijf, email, pakket: pakket as PartnerPackage, bericht };
 }

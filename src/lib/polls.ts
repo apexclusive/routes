@@ -1,7 +1,9 @@
 /**
- * Peilingen (polls): stem lokaal, uitslag altijd zichtbaar.
- * Basis-stemmen zijn deterministisch per poll-id, zodat een uitslag er
- * nooit uitziet als een verlaten dorpsplein. Pure logica → testbaar.
+ * Peilingen: alleen echte stemmen tellen.
+ *
+ * De app heeft nog geen centrale poll-database. We verzinnen daarom geen
+ * "basisstemmen" of sociale bewijskracht. `tally` rekent uitsluitend met een
+ * expliciet aangeleverde telling en geeft bij nul stemmen ook echt nul terug.
  */
 
 export interface PollDef {
@@ -10,50 +12,47 @@ export interface PollDef {
   options: string[];
 }
 
-/** Deterministische basis-stemmen per optie (hash van id+optie, 12–89). */
-export function baseVotes(id: string, options: string[]): number[] {
-  return options.map((o) => 12 + (hashStr(id + "|" + o) % 78));
+export interface PollResult {
+  votes: number[];
+  total: number;
+  percentages: number[];
+  /** -1 als er nog geen echte stem is. */
+  winner: number;
 }
 
-/** Uitslag: percentages afgerond, samen altijd 100 binnen afrondingscorrectie. */
+/**
+ * Rekent echte tellingen om naar percentages die bij een niet-lege poll exact
+ * 100 vormen. Negatieve, oneindige en ontbrekende waarden tellen als nul.
+ */
 export function tally(
-  id: string,
+  _id: string,
   options: string[],
-  localVotes: number[] | null
-): { votes: number[]; total: number; percentages: number[]; winner: number } {
-  const base = baseVotes(id, options);
-  const votes = base.map(
-    (b, i) => b + (localVotes && localVotes[i] > 0 ? localVotes[i] : 0)
-  );
-  const total = votes.reduce((a, b) => a + b, 0) || 1;
-  const raw = votes.map((v) => (v / total) * 100);
-  const percentages = raw.map((p) => Math.round(p));
-  // afronding corrigeren op het grootste restant
-  const drift = 100 - percentages.reduce((a, b) => a + b, 0);
-  if (drift !== 0 && percentages.length > 0) {
-    let idx = 0;
-    let bestRest = -1;
-    raw.forEach((p, i) => {
-      const rest = p - Math.floor(p);
-      if (rest > bestRest) {
-        bestRest = rest;
-        idx = i;
-      }
-    });
-    percentages[idx] += drift;
+  suppliedVotes: number[] | null
+): PollResult {
+  const votes = options.map((_, i) => {
+    const value = suppliedVotes?.[i] ?? 0;
+    return Number.isFinite(value) && value > 0 ? Math.floor(value) : 0;
+  });
+  const total = votes.reduce((sum, value) => sum + value, 0);
+  if (total === 0) {
+    return { votes, total: 0, percentages: options.map(() => 0), winner: -1 };
   }
+
+  const raw = votes.map((value) => (value / total) * 100);
+  const percentages = raw.map((value) => Math.floor(value));
+  let remainder = 100 - percentages.reduce((sum, value) => sum + value, 0);
+
+  // Largest-remainder-methode: stabiel en exact, ook bij drie gelijke opties.
+  const order = raw
+    .map((value, index) => ({ index, fraction: value - Math.floor(value) }))
+    .sort((a, b) => b.fraction - a.fraction || a.index - b.index);
+  for (let i = 0; remainder > 0 && order.length > 0; i++, remainder--) {
+    percentages[order[i % order.length].index] += 1;
+  }
+
   let winner = 0;
-  votes.forEach((v, i) => {
-    if (v > votes[winner]) winner = i;
+  votes.forEach((value, index) => {
+    if (value > votes[winner]) winner = index;
   });
   return { votes, total, percentages, winner };
-}
-
-function hashStr(s: string): number {
-  let h = 2166136261;
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return h >>> 0;
 }

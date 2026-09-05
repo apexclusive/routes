@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/metadata";
 import Link from "next/link";
 import { Megaphone, Mountain, CalendarDays, MousePointerClick, ShieldCheck } from "lucide-react";
 import { breadcrumbSchema } from "@/lib/schema";
@@ -6,11 +6,11 @@ import PartnerForm from "@/components/PartnerForm";
 import SiteMenu from "@/components/SiteMenu";
 import Logo from "@/components/Logo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Adverteren & partnerschappen · Apex Routes",
-  description:
-    "Zet je hotel, event, merk of dienst voor motorrijders, automobilisten, fietsers en wandelaars. Apex Routes bereikt rijdende reizigers op het moment dat ze plannen — vraag de mediakit aan.",
-};
+  description: "Zet je hotel, event, merk of dienst voor motorrijders, automobilisten, fietsers en wandelaars. Apex Routes bereikt rijdende reizigers op het moment dat ze plannen — vraag de mediakit aan.",
+  path: "/adverteren",
+});
 
 const PACKAGES = [
   {
@@ -108,7 +108,7 @@ export default function AdverterenPage() {
             >
               {i === 1 && (
                 <span className="absolute -top-2 left-4 bg-yellow-400 text-black text-[10px] font-bold px-2 py-0.5 rounded">
-                  MEEST GEKOZEN
+                  DOORLOPENDE ZICHTBAARHEID
                 </span>
               )}
               <h3 className="font-display font-bold text-[16px] mb-1">{p.title}</h3>
@@ -130,8 +130,11 @@ export default function AdverterenPage() {
         <div className="glass rounded border border-yellow-400/30 p-5 flex flex-wrap items-center gap-4 mt-4">
           <Megaphone className="w-6 h-6 text-yellow-300 shrink-0" aria-hidden />
           <p className="text-[14px] text-slate-300 flex-1 min-w-[240px]">
-            Liever eerst praten? Gebruik de feedback-knop rechtsonder op elke
-            pagina — we reageren binnen twee werkdagen.
+            Liever eerst praten? Mail{" "}
+            <a href="mailto:partners@apexclusive.nl" className="text-yellow-300 underline underline-offset-2">
+              partners@apexclusive.nl
+            </a>{" "}
+            of stuur de aanvraag rechtstreeks naar het partnerteam.
           </p>
           <Link href="/" className="btn-brand px-4 py-2.5 rounded font-semibold text-[13px]">
             Bekijk de site

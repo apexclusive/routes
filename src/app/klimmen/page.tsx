@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/metadata";
 import Klimbibliotheek from "@/components/Klimbibliotheek";
 import { breadcrumbSchema } from "@/lib/schema";
 
-export const metadata: Metadata = {
-  title: "Klimbibliotheek — elke klim van NL, BE en DE · Apex Routes",
-  description:
-    "De beklimmingen die ertoe doen: Cauberg, Camerig, Muur van Geraardsbergen, Koppenberg, Schauinsland en meer — lengte, gemiddeld en max stijgingspercentage, hoogtemeters, kassei of asfalt. Plan direct een route over de klim.",
-};
+export const metadata = pageMetadata({
+  title: "Klimbibliotheek — iconische beklimmingen · Apex Routes",
+  description: "Ontdek bekende beklimmingen in Nederland, België, Duitsland en de Alpen — met lengte, stijgingspercentages, hoogtemeters en wegdek. Plan direct een route over de klim.",
+  path: "/klimmen",
+});
 
 export default function KlimmenPage() {
   return (

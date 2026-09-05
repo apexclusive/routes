@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/metadata";
 import Advisor from "@/components/Advisor";
 import { breadcrumbSchema } from "@/lib/schema";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Apex Advisor — kennis voor onderweg · Apex Routes",
-  description:
-    "Bestemmingengidsen met geschiedenis, de steilste klimmen van Nederland, banden- en pechkennis, hotels, apps en carmeetings.",
-};
+  description: "Bestemmingengidsen met geschiedenis, bekende steile klimmen in Nederland, banden- en pechkennis, hotels, navigatie-apps en auto-evenementen.",
+  path: "/advies",
+});
 
 export default function AdviesPage() {
   return (

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Route as RouteIcon, Copy, Check, BedDouble, Mountain } from "lucide-react";
+import { Route as RouteIcon, BedDouble, Mountain } from "lucide-react";
 import Logo from "./Logo";
 import SiteMenu from "./SiteMenu";
 import LangSwitch from "./LangSwitch";
@@ -12,6 +12,7 @@ import SkipLink from "./SkipLink";
 import { RITTEN, type EventCountry } from "@/lib/ritten";
 import { CLIMBS } from "@/lib/climbs";
 import { bookingSearchUrl } from "@/lib/monetize";
+import { plannerUrl, setPendingPrompt } from "@/lib/filehandoff";
 
 const LANDEN: { id: EventCountry | "alle"; label: string }[] = [
   { id: "alle", label: "Alles" },
@@ -35,7 +36,6 @@ const TAGS: { id: string; label: string }[] = [
 export default function Ritten() {
   const [land, setLand] = useState<EventCountry | "alle">("alle");
   const [tag, setTag] = useState("alle");
-  const [copied, setCopied] = useState<string | null>(null);
 
   const klimById = new Map(CLIMBS.map((c) => [c.id, c]));
 
@@ -43,15 +43,9 @@ export default function Ritten() {
     (r) => (land === "alle" || r.country === land) && (tag === "alle" || r.tags.includes(tag))
   );
 
-  const planRit = async (r: (typeof RITTEN)[number]) => {
-    try {
-      await navigator.clipboard.writeText(r.prompt);
-      setCopied(r.id);
-      window.setTimeout(() => setCopied(null), 2400);
-    } catch {
-      window.prompt("Kopieer deze opdracht voor de planner:", r.prompt);
-    }
-    window.open("/", "_self");
+  const planRit = (r: (typeof RITTEN)[number]) => {
+    setPendingPrompt(r.prompt);
+    window.location.assign(plannerUrl(r.prompt));
   };
 
   return (
@@ -199,16 +193,21 @@ export default function Ritten() {
 
             <div className="flex flex-wrap gap-2">
               <button
-                onClick={() => void planRit(r)}
+                onClick={() => planRit(r)}
+                data-track="Planner gestart"
+                data-track-source="ritten-bibliotheek"
                 className="btn-brand px-4 py-2.5 rounded font-semibold text-[13px] flex items-center gap-1.5"
               >
-                {copied === r.id ? <Check className="w-4 h-4" aria-hidden /> : <Copy className="w-4 h-4" aria-hidden />}
-                {copied === r.id ? "Opdracht gekopieerd" : "Plan deze rit"}
+                <RouteIcon className="w-4 h-4" aria-hidden />
+                Plan direct in de planner
               </button>
               <a
                 href={bookingSearchUrl(r.plaats)}
                 target="_blank"
                 rel="noopener noreferrer sponsored"
+                data-track="Affiliate klik"
+                data-track-partner="booking"
+                data-track-context="ritten-bibliotheek"
                 className="glass border border-white/10 hover:border-yellow-400/50 px-4 py-2.5 rounded font-semibold text-[13px] flex items-center gap-1.5 transition-colors"
               >
                 <BedDouble className="w-4 h-4 text-yellow-300" aria-hidden />
@@ -224,6 +223,8 @@ export default function Ritten() {
           Afstanden en rijtijden zijn indicatief en gebaseerd op publieke bronnen
           (ANWB, myrouteapp, Wikipedia); peil altijd zelf de actuele toestand.
           Tolwegen (o.a. Grossglockner) zijn niet in de rijtijd inbegrepen.
+          Verblijflinks zijn partnerlinks: Apex kan commissie ontvangen zonder
+          dat jouw prijs daardoor hoger wordt.
         </p>
       </footer>
     </div>

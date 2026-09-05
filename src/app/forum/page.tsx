@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/metadata";
 import Forum from "@/components/Forum";
 import { breadcrumbSchema } from "@/lib/schema";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Forum — praathoek voor rijders & wandelaars · Apex Routes",
-  description:
-    "Deel routes, vergelijk navigatie-apps en toon foto's van je mooiste kilometers. Het Apex Forum werkt zonder account en gesprekken deel je via een link.",
-};
+  description: "Deel routes, vergelijk navigatie-apps en toon foto's van je mooiste kilometers. Het Apex Forum werkt zonder account en gesprekken deel je via een link.",
+  path: "/forum",
+});
 
 export default function ForumPage() {
   return (
