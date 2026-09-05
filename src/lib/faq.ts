@@ -1,5 +1,6 @@
 import type { Climb } from "./climbs.ts";
 import type { Rit } from "./ritten.ts";
+import { climbScore, klimtijdMinuten, zwaarteKlasse } from "./climbscore.ts";
 
 export type FaqItem = { q: string; a: string };
 
@@ -40,6 +41,18 @@ export function buildKlimFaq(c: Climb): FaqItem[] {
       a: `${c.seizoen.charAt(0).toUpperCase()}${c.seizoen.slice(1)}. Peil altijd de actuele toestand: sneeuw, werkzaamheden of evenementen kunnen de weg tijdelijk afsluiten.`,
     });
   }
+  const score = climbScore(c);
+  const tijd = klimtijdMinuten(c);
+  const duur = (m: number) =>
+    m >= 60 ? `${Math.floor(m / 60)} uur en ${m % 60} minuten` : `${m} minuten`;
+  items.push({
+    q: `Hoe zwaar is de ${c.name} vergeleken met andere klimmen?`,
+    a: `Op de FIETS-index scoort de ${c.name} ${nl(score)} punten: ${zwaarteKlasse(score).label.toLowerCase()} Die index weegt de hoogtemeters kwadratisch tegen de lengte en corrigeert voor hoogte boven 1000 meter — ter vergelijking: de Mont Ventoux staat rond de 12,8 en de Cauberg op 0,4.`,
+  });
+  items.push({
+    q: `Hoe lang doe je over de ${c.name}?`,
+    a: `Op de fiets reken je ongeveer ${duur(tijd.recreant)} als recreant, ${duur(tijd.sportief)} op sportief niveau en ${duur(tijd.pro)} op profniveau. Met de motor of auto ben je er in een fractie daarvan, maar juist dan loont het om te stoppen voor het uitzicht.`,
+  });
   items.push({
     q: `Waar overnacht je het best voor de ${c.name}?`,
     a: `In en rond ${c.place} vind je hotels en B&B's in elke klasse. Via de knop "Verblijf bij ${c.place}" op deze pagina check je direct de beschikbaarheid.`,

@@ -19,6 +19,7 @@ import {
   FileDown,
   Megaphone,
   Crown,
+  Trophy,
 } from "lucide-react";
 import { SITE_LINKS, SITE_GROEPEN } from "@/lib/nav";
 
@@ -26,6 +27,7 @@ const ICONEN = {
   planner: MapIcon,
   ritten: Route,
   klimmen: Mountain,
+  ranglijst: Trophy,
   kalender: CalendarDays,
   forum: MessagesSquare,
   atlas: Compass,

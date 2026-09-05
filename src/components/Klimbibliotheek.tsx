@@ -11,6 +11,7 @@ import ScrollProgress from "./ScrollProgress";
 import SkipLink from "./SkipLink";
 import { CLIMBS, type EventCountry } from "@/lib/climbs";
 import { plannerUrl, setPendingPrompt } from "@/lib/filehandoff";
+import { climbScore, rankClimbs, zwaarteKlasse, type ZwaarteKlasse } from "@/lib/climbscore";
 
 const LANDEN: { id: EventCountry | "alle"; label: string }[] = [
   { id: "alle", label: "Alles" },
@@ -30,6 +31,30 @@ const SURFACES = [
   { id: "keien", label: "Keien" },
 ] as const;
 
+const SORTERINGEN = [
+  { id: "zwaarte", label: "Zwaarste eerst" },
+  { id: "steilst", label: "Steilste stuk" },
+  { id: "langst", label: "Langste" },
+  { id: "naam", label: "Alfabetisch" },
+] as const;
+
+const KLASSEN: { id: ZwaarteKlasse | "alle"; label: string }[] = [
+  { id: "alle", label: "Elke zwaarte" },
+  { id: "instap", label: "Instap" },
+  { id: "pittig", label: "Pittig" },
+  { id: "zwaar", label: "Zwaar" },
+  { id: "loodzwaar", label: "Loodzwaar" },
+  { id: "buitencategorie", label: "Buitencategorie" },
+];
+
+const KLASSE_KLEUR: Record<ZwaarteKlasse, string> = {
+  instap: "bg-emerald-400/10 border-emerald-400/30 text-emerald-300",
+  pittig: "bg-lime-400/10 border-lime-400/30 text-lime-300",
+  zwaar: "bg-yellow-400/10 border-yellow-400/30 text-yellow-300",
+  loodzwaar: "bg-orange-400/10 border-orange-400/30 text-orange-300",
+  buitencategorie: "bg-red-400/10 border-red-400/30 text-red-300",
+};
+
 const SURFACE_LABEL: Record<string, string> = {
   asfalt: "asfalt",
   kassei: "kassei",
@@ -39,12 +64,22 @@ const SURFACE_LABEL: Record<string, string> = {
 export default function Klimbibliotheek() {
   const [land, setLand] = useState<EventCountry | "alle">("alle");
   const [surface, setSurface] = useState<(typeof SURFACES)[number]["id"]>("alle");
+  const [sortering, setSortering] = useState<(typeof SORTERINGEN)[number]["id"]>("zwaarte");
+  const [klasse, setKlasse] = useState<ZwaarteKlasse | "alle">("alle");
+
+  const rangen = new Map(rankClimbs(CLIMBS).map((r) => [r.climb.id, r.rang]));
 
   const visible = CLIMBS.filter(
     (c) =>
       (land === "alle" || c.country === land) &&
-      (surface === "alle" || c.surface === surface)
-  ).sort((a, b) => b.maxPct - a.maxPct);
+      (surface === "alle" || c.surface === surface) &&
+      (klasse === "alle" || zwaarteKlasse(climbScore(c)).klasse === klasse)
+  ).sort((a, b) => {
+    if (sortering === "steilst") return b.maxPct - a.maxPct;
+    if (sortering === "langst") return b.lengthM - a.lengthM;
+    if (sortering === "naam") return a.name.localeCompare(b.name, "nl");
+    return climbScore(b) - climbScore(a);
+  });
 
   const planRit = (prompt: string) => {
     setPendingPrompt(prompt);
@@ -70,8 +105,8 @@ export default function Klimbibliotheek() {
         </Link>
         <div className="flex items-center gap-2">
           <SiteMenu />
-          <Link href="/kalender" className="btn-ghost h-10 px-3.5 rounded font-medium text-[13px] hidden sm:flex">
-            Kalender
+          <Link href="/klimmen/ranglijst" className="btn-ghost h-10 px-3.5 rounded font-medium text-[13px] hidden sm:flex">
+            Ranglijst
           </Link>
           <Link href="/ontdek" className="btn-ghost h-10 px-3.5 rounded font-medium text-[13px] hidden sm:flex">
             Ontdek
@@ -131,8 +166,41 @@ export default function Klimbibliotheek() {
               {s.label}
             </button>
           ))}
+        </div>
+
+        <div className="flex flex-wrap gap-1.5 mb-3">
+          {KLASSEN.map((k) => (
+            <button
+              key={k.id}
+              onClick={() => setKlasse(k.id)}
+              aria-pressed={klasse === k.id}
+              className={`px-3 py-1.5 rounded text-[12px] font-semibold ${
+                klasse === k.id ? "bg-white/15 text-white" : "text-slate-500 hover:bg-white/10"
+              }`}
+            >
+              {k.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-1.5 mb-8">
+          <span className="text-[11px] uppercase tracking-widest text-slate-500 mr-1">
+            Sorteer
+          </span>
+          {SORTERINGEN.map((o) => (
+            <button
+              key={o.id}
+              onClick={() => setSortering(o.id)}
+              aria-pressed={sortering === o.id}
+              className={`px-3 py-1.5 rounded text-[12px] font-semibold ${
+                sortering === o.id ? "bg-yellow-400/15 text-yellow-300" : "text-slate-500 hover:bg-white/10"
+              }`}
+            >
+              {o.label}
+            </button>
+          ))}
           <span className="text-[12px] text-slate-500 self-center ml-2 font-mono">
-            {visible.length} klimmen · gesorteerd op steilste stuk
+            {visible.length} van {CLIMBS.length} klimmen
           </span>
         </div>
       </section>
@@ -148,19 +216,32 @@ export default function Klimbibliotheek() {
             transition={{ duration: 0.3, delay: Math.min(i * 0.02, 0.2) }}
             className="lux-card corner-frame p-5 flex flex-col"
           >
-            <div className="flex items-start justify-between mb-3">
-              <div>
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <div className="min-w-0">
                 <Link href={`/klimmen/${c.id}`} className="font-display font-bold text-[16px] leading-snug hover:text-yellow-300 transition-colors">
                   {c.name}
                 </Link>
                 <p className="text-[11px] text-slate-500 mt-0.5">
-                  {c.place} · {c.country}
+                  {c.place} · {c.country} · {c.summitM} m top
                 </p>
               </div>
-              <span className="w-9 h-9 rounded bg-yellow-400/10 border border-yellow-400/25 flex items-center justify-center shrink-0">
-                <Mountain className="w-4 h-4 text-yellow-300" aria-hidden />
-              </span>
+              <div className="flex flex-col items-end gap-1 shrink-0">
+                <span
+                  className="font-mono font-bold text-[15px] text-yellow-300 leading-none"
+                  title="FIETS-index: de standaardmaat voor de zwaarte van een beklimming"
+                >
+                  {String(climbScore(c)).replace(".", ",")}
+                </span>
+                <span className="text-[9px] uppercase tracking-widest text-slate-500 leading-none">
+                  #{rangen.get(c.id)} zwaarte
+                </span>
+              </div>
             </div>
+            <span
+              className={`self-start mb-3 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border ${KLASSE_KLEUR[zwaarteKlasse(climbScore(c)).klasse]}`}
+            >
+              {zwaarteKlasse(climbScore(c)).klasse}
+            </span>
             <div className="grid grid-cols-4 gap-2 mb-3 font-mono">
               <div className="bg-white/5 rounded p-2 text-center">
                 <p className="text-[9px] uppercase tracking-wide text-slate-500">lengte</p>
@@ -212,9 +293,12 @@ export default function Klimbibliotheek() {
         <p className="text-[11px] text-slate-500 leading-relaxed flex items-start gap-2">
           <Road className="w-3.5 h-3.5 shrink-0 mt-0.5" aria-hidden />
           Cijfers zijn indicatief en afgerond (bronnen: wielerflits, fiets.nl,
-          climbfinder) — hoogtevelden en percentages variëren per bron en meting;
+          climbfinder, organisatiedata van de Maratona dles Dolomites) — hoogtevelden
+          en percentages variëren per bron en meting;
           het verkeersbord ter plekke telt. Staan er klimmen die je mist? Meld
-          ze via de feedback-knop rechtsonder.
+          ze via de feedback-knop rechtsonder. De zwaarte is de FIETS-index
+          (H²/(D×10) plus hoogtecorrectie boven 1000 m), met een eigen toeslag
+          voor kasseien en keien.
         </p>
       </footer>
     </div>

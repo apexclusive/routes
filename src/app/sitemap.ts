@@ -21,6 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       freq: "monthly" as const,
     })),
     { path: "/klimmen", priority: 0.8, freq: "monthly" },
+    { path: "/klimmen/ranglijst", priority: 0.8, freq: "monthly" },
     ...CLIMBS.map((c) => ({
       path: `/klimmen/${c.id}`,
       priority: 0.7,
