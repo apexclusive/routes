@@ -32,7 +32,7 @@
 Basis gratis (3 AI-routes en 5 GPX-downloads per dag) · Supporter €2,99/maand (10/15) · Pro €5,99/maand, €39/jaar of €99 lifetime (onbeperkt). Betalen loopt via server-side Stripe Checkout en verificatie; publieke demo-codes zijn in productie uit. Relevante hotel- en activiteitenlinks kunnen herkenbare partnerlinks zijn. Betaalde plannen helpen routingcapaciteit, datakwaliteit en routeonderzoek financieren.
 
 ## Data & bronnen
-Kaarten: CARTO + Esri (basemap incl. topografisch), OpenStreetMap-data via OSRM, Nominatim (geocoding), Overpass (POI's) en Open-Meteo (weer/hoogte). Evenementen-routes van organisaties (StreetGasm, CC Rally, Limburgs Mooiste) worden niet herpubliceerd — we verwijzen naar de bron.
+Kaarten: Esri World Street Map, World Topo Map en World Imagery (zonder API-sleutel in browsercode), OpenStreetMap-data via OSRM, Nominatim (geocoding), Overpass (POI's) en Open-Meteo (weer/hoogte). Evenementen-routes van organisaties (StreetGasm, CC Rally, Limburgs Mooiste) worden niet herpubliceerd — we verwijzen naar de bron.
 
 ## Community & accounts
 Het forum en prikbord werken zonder server: alles blijft in de browser en delen gaat via links. Een optioneel licht profiel (naam + e-mail) blijft lokaal en kan checkoutvelden vooraf invullen; het is geen gesynchroniseerd serveraccount.

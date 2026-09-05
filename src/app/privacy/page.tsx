@@ -31,7 +31,7 @@ export default function PrivacyPage() {
         </LegalSection>
 
         <LegalSection title="3. Route-, kaart-, weer- en locatiediensten">
-          <p>Om een route te berekenen stuurt de server noodzakelijke plaatsnamen of coördinaten door naar geconfigureerde diensten zoals OpenStreetMap/Nominatim, OSRM, OpenRouteService, Overpass, Open-Meteo, CARTO en Esri. De browser haalt kaarttegels bij CARTO/Esri en lettertypebestanden bij Google Fonts op; deze aanbieders ontvangen daarbij normale verbindingsgegevens zoals het IP-adres. Hun eigen privacyvoorwaarden gelden voor die verwerking.</p>
+          <p>Om een route te berekenen stuurt de server noodzakelijke plaatsnamen of coördinaten door naar geconfigureerde diensten zoals OpenStreetMap/Nominatim, OSRM, OpenRouteService, Overpass, Open-Meteo en Esri. De browser haalt kaarttegels bij Esri en lettertypebestanden bij Google Fonts op; deze aanbieders ontvangen daarbij normale verbindingsgegevens zoals het IP-adres. Hun eigen privacyvoorwaarden gelden voor die verwerking.</p>
           <p>Browserlocatie wordt alleen gevraagd na jouw actie. Apex bewaart geen doorlopende locatiegeschiedenis op een eigen server. Bij rit-opname blijft de opname lokaal tenzij jij zelf een deel-link maakt.</p>
         </LegalSection>
 

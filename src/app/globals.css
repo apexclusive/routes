@@ -225,10 +225,12 @@
   background: rgba(22, 22, 22, 0.98) !important;
 }
 
-/* dark treatment for the key-free OSM tiles */
+/* Donkere Apex-behandeling voor de sleutelvrije Esri-stratenkaart. Alleen de
+   rastertegels krijgen dit filter; route, markers en labels van Apex blijven
+   daardoor helder en kleurvast. */
 .apex-dark-tiles {
-  filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.85)
-    saturate(0.85);
+  filter: invert(1) hue-rotate(180deg) brightness(0.72) contrast(1.15)
+    saturate(0.55);
 }
 /* ---------- navigatie-ankers en focus-pulse ---------- */
 /* Genummerde stipjes op de routelijn: de punten die Google Maps meekrijgt. */
