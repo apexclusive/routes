@@ -5,6 +5,12 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { Coordinates, Waypoint, GeoJSON } from "@/types";
 import { RoutePoi, poiIcon } from "@/lib/pois";
+import {
+  fallbackMapStyle,
+  MAP_TILE_SOURCES,
+  type MapStyle,
+  type MapTileSource,
+} from "@/lib/maptiles";
 
 interface PremiumMapProps {
   waypoints: Waypoint[];
@@ -13,7 +19,7 @@ interface PremiumMapProps {
   onWaypointDrag?: (waypoint: Waypoint, coords: Coordinates) => void;
   interactive?: boolean;
   /** kaartstijl: donker (standaard), satelliet of topografisch met hoogtelijnen */
-  mapStyle?: "dark" | "satellite" | "topo";
+  mapStyle?: MapStyle;
   className?: string;
   /**
    * Punt waar de kaart naartoe vliegt, met een korte pulse. De `key` maakt
@@ -28,31 +34,14 @@ interface PremiumMapProps {
   rideMarker?: { lat: number; lng: number; bearing: number; active: boolean } | null;
 }
 
-const DARK_TILES = {
-  // CARTO dark basetiles: stabiel voor embedded gebruik (OSM blokkeert
-  // directe tile-gebruik vanaf apps: "Access blocked") — attribution is de deal.
-  url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-  attribution:
-    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-  className: undefined as string | undefined,
-};
-
-const TOPO_TILES = {
-  // Esri World Topo Map: sleutelvrije topografische wereldkaart met
-  // hoogte-terreinschaduw — sterk voor wandelen en fiets. (OpenTopoMap serveert
-  // sinds 2025 "API key required"-tegels bij drukte; daarom geen OSM-topo meer.)
-  url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
-  attribution:
-    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://www.esri.com/">Esri</a>, HERE, Garmin, FAO, NOAA',
-  className: undefined as string | undefined,
-};
-
-const SATELLITE_TILES = {
-  url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-  attribution:
-    'Imagery &copy; <a href="https://www.esri.com/">Esri</a>, Maxar, Earthstar Geographics',
-  className: undefined as string | undefined,
-};
+function createTileLayer(source: MapTileSource): L.TileLayer {
+  return L.tileLayer(source.url, {
+    maxZoom: source.maxZoom,
+    attribution: source.attribution,
+    className: source.className,
+    crossOrigin: true,
+  });
+}
 
 function escapeHtml(s: string): string {
   return s
@@ -134,11 +123,7 @@ export default function PremiumMap({
       attributionControl: false, // we voegen zelf één control toe (geen duplicaten)
     });
 
-    tileLayerRef.current = L.tileLayer(DARK_TILES.url, {
-      maxZoom: 19,
-      attribution: DARK_TILES.attribution,
-      className: DARK_TILES.className,
-    }).addTo(map);
+    tileLayerRef.current = createTileLayer(MAP_TILE_SOURCES.dark).addTo(map);
 
     L.control.zoom({ position: "bottomright" }).addTo(map);
     L.control.attribution({ position: "bottomleft", prefix: false }).addTo(map);
@@ -169,39 +154,30 @@ export default function PremiumMap({
   useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map || !isLoaded) return;
-    const tiles =
-      mapStyle === "satellite"
-        ? SATELLITE_TILES
-        : mapStyle === "topo"
-          ? TOPO_TILES
-          : DARK_TILES;
-    if (tileLayerRef.current) {
-      map.removeLayer(tileLayerRef.current);
-    }
-    const layer = L.tileLayer(tiles.url, {
-      maxZoom: 19,
-      attribution: tiles.attribution,
-      className: tiles.className,
-      subdomains: "abcd",
-    }).addTo(map);
+
+    if (tileLayerRef.current) map.removeLayer(tileLayerRef.current);
+
+    const layer = createTileLayer(MAP_TILE_SOURCES[mapStyle]).addTo(map);
     tileLayerRef.current = layer;
 
-    // vangnet: als een provider massaal tegels weigert (403/blokkaade),
-    // vallen we terug op Esri-satelliet — of, bij satelliet zelf, op donker.
+    // Na vier echte netwerkfouten schakelen we naar een tweede, leesbare
+    // ArcGIS-laag. De oude CARTO-bron komt nergens meer in de keten voor.
     let errors = 0;
     const onTileError = () => {
       errors += 1;
-      if (errors < 8 || tileLayerRef.current !== layer) return;
-      const fallback = tiles === SATELLITE_TILES ? DARK_TILES : SATELLITE_TILES;
-      if (tileLayerRef.current) map.removeLayer(tileLayerRef.current);
-      tileLayerRef.current = L.tileLayer(fallback.url, {
-        maxZoom: 19,
-        attribution: fallback.attribution,
-      }).addTo(map);
+      if (errors < 4 || tileLayerRef.current !== layer) return;
+
+      map.removeLayer(layer);
+      const fallback = MAP_TILE_SOURCES[fallbackMapStyle(mapStyle)];
+      tileLayerRef.current = createTileLayer(fallback).addTo(map);
     };
     layer.on("tileerror", onTileError);
-    // route (overlayPane) en markers (markerPane) renderen boven de tilePane,
-    // dus bij wisselen van basemap is geen handmatige z-ordering nodig.
+
+    // Route (overlayPane) en markers (markerPane) renderen vanzelf boven de
+    // tilePane; ook na een fallback blijft de gele route dus zichtbaar.
+    return () => {
+      layer.off("tileerror", onTileError);
+    };
   }, [mapStyle, isLoaded]);
 
   // route geometry (donkere casing + gele lijn erbovenop)

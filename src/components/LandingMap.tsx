@@ -3,11 +3,12 @@
 import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { MAP_TILE_SOURCES } from "@/lib/maptiles";
 
 /**
- * Live kaartpaneel voor de landing: donkere OSM-tegels met een geanimeerde
- * demoroute (Mergelland-vorm) als vloeiende beweging-stippellijn. Niet
- * interactief — de echte kaart wacht in de app.
+ * Live kaartpaneel voor de landing: een lokaal donker gemaakte Esri-stratenkaart
+ * met een geanimeerde demoroute (Mergelland-vorm). Niet interactief — de echte
+ * kaart wacht in de app.
  */
 
 // Mergelland- vorm: Maastricht → Eijsden → Slenaken → Gulpen → Valkenburg → terug
@@ -63,7 +64,7 @@ export default function LandingMap({ className = "" }: { className?: string }) {
       center: [50.81, 5.78],
       zoom: 11,
       zoomControl: false,
-      attributionControl: true,
+      attributionControl: false,
       dragging: false,
       scrollWheelZoom: false,
       doubleClickZoom: false,
@@ -72,15 +73,33 @@ export default function LandingMap({ className = "" }: { className?: string }) {
       touchZoom: false,
     });
 
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-      maxZoom: 19,
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    const darkTiles = MAP_TILE_SOURCES.dark;
+    const baseLayer = L.tileLayer(darkTiles.url, {
+      maxZoom: darkTiles.maxZoom,
+      attribution: darkTiles.attribution,
+      className: darkTiles.className,
+      crossOrigin: true,
     }).addTo(map);
 
-    L.control
-      .attribution({ position: "bottomright", prefix: false })
-      .addTo(map);
+    // Ook de homepage houdt een werkende basiskaart bij tijdelijke tegelfouten.
+    // CARTO is bewust geen fallback: de fouttegel kwam daar met HTTP 200 terug.
+    let tileErrors = 0;
+    const onTileError = () => {
+      tileErrors += 1;
+      if (tileErrors < 4 || !map.hasLayer(baseLayer)) return;
+
+      baseLayer.off("tileerror", onTileError);
+      map.removeLayer(baseLayer);
+      const topoTiles = MAP_TILE_SOURCES.topo;
+      L.tileLayer(topoTiles.url, {
+        maxZoom: topoTiles.maxZoom,
+        attribution: topoTiles.attribution,
+        crossOrigin: true,
+      }).addTo(map);
+    };
+    baseLayer.on("tileerror", onTileError);
+
+    L.control.attribution({ position: "bottomright", prefix: false }).addTo(map);
 
     const path = smoothPath(PLACES);
     const latLngs = path.map((p) => [p[0], p[1]]) as L.LatLngExpression[];
@@ -122,6 +141,7 @@ export default function LandingMap({ className = "" }: { className?: string }) {
 
     mapRef.current = map;
     return () => {
+      baseLayer.off("tileerror", onTileError);
       map.remove();
       mapRef.current = null;
     };

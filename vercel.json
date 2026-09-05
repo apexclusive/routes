@@ -1,4 +1,10 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "git": {
+    "deploymentEnabled": {
+      "arena/**": false
+    }
+  },
   "crons": [
     {
       "path": "/api/events",

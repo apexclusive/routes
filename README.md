@@ -80,7 +80,7 @@ op de pagina te slepen (drag & drop) én via de knop; export weer als GPX.
   routebeschrijving, zonder kaart en knoppen.
 - 📱 **Installeerbaar als app** (PWA) — op je beginscherm, fullscreen, met een
   service worker die de app-shell beschikbaar houdt als het netwerk wegvalt.
-- 🛰️ **Kaart- én satellietweergave** (CARTO donkere basiskaart + ESRI World Imagery) met één klik.
+- 🛰️ **Kaart- én satellietweergave** (donker gefilterde Esri World Street Map + Esri World Imagery) met één klik, zonder API-sleutel in de browser.
 - 🎬 **Demo-rit** — rij je route virtueel vooraf: rijdende marker die de camera volgt,
   afslagbanners ("over 300 m linksaf") en optioneel gesproken instructies (Web Speech).
 - 🧭 **[Ontdek routes](/ontdek)** — top-10 per land (NL · BE · LU · DE), mooie ritten naar
@@ -142,7 +142,7 @@ op de pagina te slepen (drag & drop) én via de knop; export weer als GPX.
 - **Bento-functies met fotografie**: zes kaarten (2 bred + 4 smal, perfect raster) met routescape-achtergronden, nummering 01–06, lucide-iconen in glas-chips en geanimeerde micro-visuals (typende chat-bubbels, zichzelf tekenende routelijn, pulserende tank-POI's, deellink+copy, app-chips, hoogteprofiel + weer).
 - **Emoji-vrij en volwassen**: alle functionele icoontjes op landing, roulette, atlas, 404 en chips zijn nu lucide-iconen; 🎲→Dices, 📏/⛰️→Route/TrendingUp, 🗺️→MapPinned; de rouletterand kreeg ✦-markers.
 - **Header**: sticky glass-nav met lucide-nav, gele accent-iconen, **mobiel hamburgermenu** (slide-over met alles: links, import, taal, CTA) en een **scroll-voortgangsbalk** bovenin.
-- **Footer**: vijf kolommen (merk + steun-CTA, Plannen, Ontdekken, Community, Waarom Apex), topo-hoogtelijnen-achtergrond, bronvermelding (OSM · CARTO · Esri · OpenTopoMap · Open-Meteo) en taalwisselaar.
+- **Footer**: vijf kolommen (merk + steun-CTA, Plannen, Ontdekken, Community, Waarom Apex), topo-hoogtelijnen-achtergrond, bronvermelding (OpenStreetMap · Esri · Open-Meteo) en taalwisselaar.
 - **CSS-laag** (`globals.css`): `.photo-card` (zoom + veil-gradient + rand-gloed), `.route-draw`, `.poi-dot`, `.typing-dot`, `.topo-lines`, `.scroll-progress` — allemaal met `prefers-reduced-motion`-vangnet.
 
 ## NIGHTDRIVE v4 — het site-brede thema
