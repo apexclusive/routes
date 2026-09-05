@@ -3,7 +3,7 @@ export type SiteLink = {
   href: string;
   label: string;
   /** icoon-key, gemapt in SiteMenu */
-  icon: "planner" | "ritten" | "tours" | "klimmen" | "ranglijst" | "kalender" | "forum" | "atlas" | "advisor" | "ritbank" | "checklist" | "gpx" | "pricing" | "adverteren";
+  icon: "planner" | "ritten" | "tours" | "passen" | "klimmen" | "ranglijst" | "kalender" | "forum" | "atlas" | "advisor" | "ritbank" | "checklist" | "gpx" | "pricing" | "adverteren";
   groep: "plannen" | "ontdekken" | "meer";
 };
 
@@ -13,6 +13,7 @@ export const SITE_LINKS: SiteLink[] = [
   { href: "/tours", label: "Meerdaagse tours", icon: "tours", groep: "plannen" },
   { href: "/klimmen", label: "Klimbibliotheek", icon: "klimmen", groep: "plannen" },
   { href: "/klimmen/ranglijst", label: "Klimranglijst", icon: "ranglijst", groep: "plannen" },
+  { href: "/passen", label: "Passen open?", icon: "passen", groep: "plannen" },
   { href: "/kalender", label: "Evenementenkalender", icon: "kalender", groep: "plannen" },
   { href: "/ontdek", label: "Route-atlas", icon: "atlas", groep: "ontdekken" },
   { href: "/advies", label: "Route-advisor", icon: "advisor", groep: "ontdekken" },

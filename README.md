@@ -411,6 +411,35 @@ abstract getal. Allebei gedicht.
   geen hotelraming heeft, en één die controleert dat zelf rijden nooit duurder
   uitvalt dan de georganiseerde reis waarmee we het vergelijken. `sw.js` v49.
 
+## Ronde 36: "is de Stelvio al open?" en prijzen die zichzelf bijhouden (v6.37)
+
+De meest gestelde vraag in dit hele onderwerp is niet welke route de mooiste
+is, maar of de weg er überhaupt doorheen gaat. Die vraag piekt elk voorjaar
+opnieuw en is puur seizoensgebonden zoekverkeer — precies waar een
+klimbibliotheek van 43 passen op kan aansluiten.
+
+- **`src/lib/passtatus.ts` + `/passen`** — seizoenskalender van 18 alpenpassen.
+  Kies een maand, zie welke passen dan normaal open liggen. Geijkt op de
+  werkelijke data van 2026: Grossglockner 25 april, Furka/Grimsel/Nufenen
+  29 mei, Stelvio 31 mei, Susten en Iséran pas 12 juni. Inclusief de autovrije
+  fietsdagen (Stelvio 29 augustus en 19 september 2026) en per pas een link
+  naar de wegbeheerder.
+- **Bewust géén live-status.** Wie op basis van een gemiddelde 800 km rijdt en
+  voor een slagboom staat, komt nooit meer terug. Daarom heet het overal
+  "meestal open", zijn de randmaanden expliciet als risico gemarkeerd, en staat
+  de officiële bron er altijd naast. Een test bewaakt dat er in januari geen
+  enkele pas op "open" kan staan.
+- **`scripts/ververs-prijzen.mjs`** (`npm run prijzen`) — haalt de
+  brandstofprijzen op uit het Weekly Oil Bulletin en laat eerst zien wat er zou
+  wijzigen; pas met `--schrijf` gaat het het bestand in. Het script weigert te
+  schrijven als de helft van de landen ontbreekt, want dan is de bronpagina
+  veranderd. Zwitserland zit niet in de EU-bron en houdt zichtbaar zijn
+  handmatige waarde in plaats van een verzonnen getal.
+- **Kruislinks** — vanaf elke tour "Zijn de passen al open?", en `/passen` in
+  het site-menu, mobiele menu, footer en de sitemap.
+- **363 tests groen**, waaronder een controle dat elke pas naar een bestaande
+  klim verwijst en dat de hoogtes overeenkomen met de klimbibliotheek. `sw.js` v50.
+
 ## Productie-integraties
 
 De kernplanner werkt zonder commerciële sleutels. Voor een productie-uitrol staan alle

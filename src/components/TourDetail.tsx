@@ -120,6 +120,12 @@ export default function TourDetail({ tour }: { tour: Tour }) {
         <div className="flex flex-wrap items-center gap-2 mb-3 text-[12px] text-slate-400">
           <CalendarDays className="w-3.5 h-3.5 text-yellow-400" aria-hidden />
           <span>{tour.seizoen}</span>
+          <Link
+            href="/passen"
+            className="text-yellow-400 hover:text-yellow-300 underline underline-offset-2"
+          >
+            Zijn de passen al open?
+          </Link>
         </div>
         <div className="flex flex-wrap gap-1.5 mb-8">
           {tour.voertuigen.map((v) => (

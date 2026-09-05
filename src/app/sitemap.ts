@@ -5,7 +5,7 @@ import { TOURS } from "@/lib/tours";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = "https://routes.apexclusive.nl";
-  const lastModified = new Date("2026-09-05T00:00:00.000Z");
+  const lastModified = new Date("2026-09-06T00:00:00.000Z");
   const routes: { path: string; priority: number; freq: "daily" | "weekly" | "monthly" | "yearly" }[] = [
     { path: "/", priority: 1, freq: "weekly" },
     { path: "/ontdek", priority: 0.9, freq: "weekly" },
@@ -21,6 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
       freq: "monthly" as const,
     })),
+    { path: "/passen", priority: 0.9, freq: "weekly" },
     { path: "/tours", priority: 0.9, freq: "monthly" },
     ...TOURS.map((t) => ({
       path: `/tours/${t.id}`,

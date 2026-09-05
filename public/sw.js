@@ -9,7 +9,7 @@
  *    veranderen nooit onder dezelfde URL;
  *  - API-calls en kaarttegels nooit cachen — die horen vers te zijn.
  */
-const VERSION = "v49";
+const VERSION = "v50";
 const SHELL_CACHE = `apex-shell-${VERSION}`;
 const ASSET_CACHE = `apex-assets-${VERSION}`;
 

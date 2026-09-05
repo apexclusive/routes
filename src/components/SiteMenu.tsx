@@ -21,6 +21,7 @@ import {
   Crown,
   Trophy,
   BedDouble,
+  SunSnow,
 } from "lucide-react";
 import { SITE_LINKS, SITE_GROEPEN } from "@/lib/nav";
 
@@ -28,6 +29,7 @@ const ICONEN = {
   planner: MapIcon,
   ritten: Route,
   tours: BedDouble,
+  passen: SunSnow,
   klimmen: Mountain,
   ranglijst: Trophy,
   kalender: CalendarDays,

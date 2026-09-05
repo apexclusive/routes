@@ -34,6 +34,7 @@ import {
   Megaphone,
   Route,
   BedDouble,
+  SunSnow,
 } from "lucide-react";
 import Logo from "./Logo";
 import SkipLink from "./SkipLink";
@@ -462,6 +463,7 @@ export default function Landing({
                   { href: "/gpx", icon: FileDown, label: t.footer.gpx },
                   { href: "/ritten", icon: Route, label: t.footer.ritten },
                   { href: "/tours", icon: BedDouble, label: "Meerdaagse tours" },
+                  { href: "/passen", icon: SunSnow, label: "Passen open?" },
                   { href: "/klimmen", icon: Mountain, label: t.footer.klimmen },
                   { href: "/prijzen", icon: Crown, label: "Apex Pro & prijzen" },
                   { href: "/adverteren", icon: Megaphone, label: t.footer.adverteren },
@@ -1117,6 +1119,7 @@ export default function Landing({
                 <li><a href="/ontdek" className="text-slate-400 hover:text-yellow-400 transition-colors flex items-center gap-1.5">{t.nav.discover}</a></li>
                 <li><a href="/advies" className="text-slate-400 hover:text-yellow-400 transition-colors">{t.nav.advisor}</a></li>
                 <li><a href="/kalender" className="text-slate-400 hover:text-yellow-400 transition-colors">{t.nav.kalender}</a></li>
+                <li><a href="/passen" className="text-slate-400 hover:text-yellow-400 transition-colors">Passen open?</a></li>
               </ul>
             </div>
 
