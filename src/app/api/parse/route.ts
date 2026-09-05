@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { clientKey, rateLimitHeaders, takeRateLimit } from "@/lib/server/rateLimit";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,15 @@ export const dynamic = "force-dynamic";
  * UI een indicator tonen (een lege text doet géén upstream-call).
  */
 export async function POST(req: NextRequest) {
+  // Bescherm de betaalde LLM-sleutel ook als iemand de clientlimiet omzeilt.
+  const rate = takeRateLimit(`ai:${clientKey(req.headers)}`, 30, 60 * 60 * 1000);
+  if (!rate.allowed) {
+    return NextResponse.json(
+      { ai: null, aiConfigured: Boolean(process.env.OPENAI_API_KEY), error: "rate limit" },
+      { status: 429, headers: { ...rateLimitHeaders(rate), "Retry-After": "3600" } }
+    );
+  }
+
   const key = process.env.OPENAI_API_KEY;
   if (!key) {
     return NextResponse.json({ ai: null, aiConfigured: false });

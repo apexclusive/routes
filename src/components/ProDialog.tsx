@@ -1,14 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Crown, Check, Sparkles, Heart, User, Gift } from "lucide-react";
-import { checkoutUrl, anyCheckoutConfigured } from "@/lib/monetize";
+import { X, Crown, Check, Heart, User, Gift, LoaderCircle, ShieldCheck } from "lucide-react";
+import { beginCheckout, openBillingPortal } from "@/lib/billing";
+import { trackEvent } from "@/lib/analytics";
 import { useEffect } from "react";
 import {
   PRO_PLANS,
   PRO_BENEFITS,
   SUPPORTER_BENEFITS,
+  DEMO_CODES_ENABLED,
   TIER_LIMITS,
   activatePro,
   deactivatePro,
@@ -30,11 +33,9 @@ import {
 } from "@/lib/account";
 
 /**
- * Apex-lidmaatschap: Basis (gratis) → Supporter → Pro, met proefmaand.
- * Steun wordt geformuleerd als wat het is: inkoop van betere data voor
- * iedereen. Betalen via Stripe-link (NEXT_PUBLIC_STRIPE_LINK); zonder
- * sleutel werkt de activatiecode-flow (demo's: APEXSUPPORT, APEXPRO,
- * APEXPROEF).
+ * Apex-lidmaatschap: Basis → Supporter → Pro. Een server-side gecreëerde
+ * Stripe Checkout-sessie wordt na terugkomst geverifieerd voordat de laag
+ * actief wordt. Demo-codes bestaan uitsluitend in expliciete previewmodus.
  */
 export default function ProDialog({
   open,
@@ -45,6 +46,7 @@ export default function ProDialog({
   onClose: () => void;
   onProChange?: (state: ProState) => void;
 }) {
+  const dialogRef = useRef<HTMLDivElement>(null);
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
   // override na eigen acties; anders live uit de opslag lezen
@@ -58,19 +60,51 @@ export default function ProDialog({
   const state = override ?? getProState();
   useEffect(() => {
     if (!open) return;
-    const r = requestAnimationFrame(() => setAccount(getAccount()));
+    const previousFocus = document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const r = requestAnimationFrame(() => {
+      setAccount(getAccount());
+      dialogRef.current?.querySelector<HTMLElement>("[data-dialog-close]")?.focus();
+    });
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
+        return;
+      }
+      if (e.key !== "Tab" || !dialogRef.current) return;
+      const focusable = Array.from(
+        dialogRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter((element) => !element.hasAttribute("hidden"));
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => {
       cancelAnimationFrame(r);
       window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = previousOverflow;
+      previousFocus?.focus();
     };
   }, [open, onClose]);
   const tier = tierOf(state);
   const trial = trialDaysLeft(state);
   const [pendingPlan, setPendingPlan] = useState<ProPlan | null>(null);
+  const [checkoutError, setCheckoutError] = useState("");
+  const [portalLoading, setPortalLoading] = useState(false);
 
   const sync = (next: ProState) => {
     setOverride(next);
@@ -127,6 +161,37 @@ export default function ProDialog({
     sync(getProState());
   };
 
+  const startCheckout = async (plan: ProPlan) => {
+    if (pendingPlan) return;
+    setPendingPlan(plan);
+    setCheckoutError("");
+    trackEvent("Checkout gestart", { plan, location: "pro-dialog" });
+    try {
+      const result = await beginCheckout(plan, account?.email);
+      window.location.assign(result.url);
+    } catch (err) {
+      setPendingPlan(null);
+      setCheckoutError(
+        err instanceof Error ? err.message : "Betalen kon niet worden gestart."
+      );
+    }
+  };
+
+  const manageSubscription = async () => {
+    if (!state.sessionId || portalLoading) return;
+    setPortalLoading(true);
+    setCheckoutError("");
+    trackEvent("Abonnement beheren geopend", { plan: state.plan });
+    try {
+      window.location.assign(await openBillingPortal(state.sessionId));
+    } catch (err) {
+      setPortalLoading(false);
+      setCheckoutError(
+        err instanceof Error ? err.message : "Abonnementsbeheer kon niet worden geopend."
+      );
+    }
+  };
+
   const tierLabel =
     tier === "pro"
       ? "Pro"
@@ -145,6 +210,7 @@ export default function ProDialog({
           onClick={onClose}
         >
           <motion.div
+            ref={dialogRef}
             initial={{ opacity: 0, y: 24, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.98 }}
@@ -163,12 +229,13 @@ export default function ProDialog({
                 <div>
                   <h2 className="font-display font-bold text-xl">Steun de kaart</h2>
                   <p className="text-[13px] text-slate-400">
-                    Basis gratis · Supporter €2,99 · Pro onbeperkt
+                    Basis gratis · Supporter €2,99/mnd · Pro vanaf €3,25/mnd
                   </p>
                 </div>
               </div>
               <button
                 onClick={onClose}
+                data-dialog-close
                 className="p-2 hover:bg-white/10 rounded transition-colors"
                 aria-label="Sluiten"
               >
@@ -195,11 +262,11 @@ export default function ProDialog({
                 </p>
                 <p className="text-sm text-slate-400 mt-1 mb-5 max-w-sm mx-auto leading-relaxed">
                   {tier === "supporter"
-                    ? "Bedankt! Jouw steun laat ons betere kaart- en routedata inkopen en dieper researchen welke routes er écht toe doen."
-                    : "Alle limieten zijn opgeheven. Bedankt — jij maakt diepere route-research mogelijk."}
+                    ? "Bedankt! Jouw steun helpt routingcapaciteit, datakwaliteit en grondig routeonderzoek betalen."
+                    : "Alle limieten zijn opgeheven. Bedankt — jij helpt de planner snel en de routeresearch scherp te houden."}
                 </p>
                 <p className="text-[12px] text-slate-500 mb-5">
-                  Vandaag nog: {Number.isFinite(TIER_LIMITS[tier].aiRoutes) ? `${TIER_LIMITS[tier].aiRoutes} AI-routes / ${TIER_LIMITS[tier].exports} exports` : "onbeperkt"}
+                  Vandaag nog: {Number.isFinite(TIER_LIMITS[tier].aiRoutes) ? `${TIER_LIMITS[tier].aiRoutes} AI-routes / ${TIER_LIMITS[tier].exports} GPX-downloads` : "onbeperkt"}
                 </p>
                 {account && (
                   <p className="text-[12px] text-slate-400 mb-4">
@@ -219,23 +286,74 @@ export default function ProDialog({
                     </span>
                   </p>
                 )}
-                <button
-                  onClick={turnOff}
-                  className="btn-ghost px-4 py-2 rounded text-sm"
-                >
-                  Deactiveren (op deze browser)
-                </button>
+                {state.source === "stripe" ? (
+                  state.plan === "life" ? (
+                    <p className="text-[11px] text-slate-500 flex items-center justify-center gap-1.5">
+                      <ShieldCheck className="w-3.5 h-3.5" aria-hidden />
+                      Eenmalig betaald en veilig geverifieerd via Stripe
+                    </p>
+                  ) : (
+                    <button
+                      onClick={() => void manageSubscription()}
+                      disabled={portalLoading}
+                      className="btn-ghost px-4 py-2 rounded text-sm inline-flex items-center gap-2 disabled:opacity-60"
+                    >
+                      {portalLoading ? <LoaderCircle className="w-4 h-4 animate-spin" aria-hidden /> : <ShieldCheck className="w-4 h-4" aria-hidden />}
+                      {portalLoading ? "Beheer openen…" : "Abonnement en facturen beheren"}
+                    </button>
+                  )
+                ) : (
+                  <button
+                    onClick={turnOff}
+                    className="btn-ghost px-4 py-2 rounded text-sm"
+                  >
+                    Deactiveren (op deze browser)
+                  </button>
+                )}
+                {state.source === "stripe" && (
+                  <p className="mt-3 text-[11px] text-slate-600">
+                    Consument binnen de bedenktijd?{" "}
+                    <Link href="/herroepen" className="underline hover:text-yellow-300">
+                      Aankoop online herroepen
+                    </Link>
+                  </p>
+                )}
+                {checkoutError && (
+                  <p className="text-[12px] text-red-300 mt-3" role="alert">{checkoutError}</p>
+                )}
               </div>
             ) : (
               <>
+                {state.source === "stripe" && state.sessionId && (
+                  <div className="glass rounded border border-amber-400/30 bg-amber-400/[0.05] p-4 mb-4">
+                    <p className="text-[13px] font-semibold text-amber-200">Dit betaalde recht is nu niet actief</p>
+                    <p className="text-[12px] text-slate-400 mt-1 mb-3 leading-relaxed">
+                      Je routes blijven staan. Controleer je betaalstatus of kies opnieuw een plan.
+                    </p>
+                    {state.plan !== "life" ? (
+                      <button
+                        onClick={() => void manageSubscription()}
+                        disabled={portalLoading}
+                        className="btn-ghost px-3.5 py-2 text-[12px] inline-flex items-center gap-2 disabled:opacity-60"
+                      >
+                        {portalLoading && <LoaderCircle className="w-3.5 h-3.5 animate-spin" aria-hidden />}
+                        Betaling en abonnement beheren
+                      </button>
+                    ) : (
+                      <a href="mailto:partners@apexclusive.nl" className="text-[12px] text-yellow-300 underline underline-offset-2">
+                        Lifetime-toegang laten herstellen
+                      </a>
+                    )}
+                  </div>
+                )}
+
                 {/* steun-boodschap */}
                 <div className="glass rounded border border-yellow-400/25 p-4 mb-5">
                   <p className="text-[13px] text-slate-300 leading-relaxed">
-                    <b className="text-yellow-300">Waar je steun heen gaat:</b> we
-                    kopen er de beste data mee in — actueel kaartmateriaal,
-                    hoogte- en routekwaliteitssets — en we nemen de tijd om
-                    routes en tips écht te rijden en te checken. Beter voor jou,
-                    beter voor iedereen die gratis plannet.
+                    <b className="text-yellow-300">Waar je steun bij helpt:</b>{" "}
+                    routing- en AI-capaciteit, monitoring, datakwaliteit en tijd
+                    voor grondig routeonderzoek. Beter voor jou, en beter voor
+                    iedereen die gratis plant.
                   </p>
                 </div>
 
@@ -250,7 +368,7 @@ export default function ProDialog({
                     >
                       {p.id === "year" && (
                         <span className="absolute -top-2 left-1/2 -translate-x-1/2 bg-yellow-400 text-black text-[10px] font-bold px-2 py-0.5 rounded whitespace-nowrap">
-                          POPULAIR
+                          46% VOORDEEL
                         </span>
                       )}
                       <p className="text-[11px] uppercase tracking-wide text-slate-400 flex items-center justify-center gap-1">
@@ -261,21 +379,37 @@ export default function ProDialog({
                       <p className="text-[11px] text-slate-500 mt-1 leading-snug">
                         {p.note}
                       </p>
-                      {checkoutUrl(p.id) && (
-                        <a
-                          href={checkoutUrl(p.id)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={() => {
-                            setPendingPlan(p.id);
-                          }}
-                          className="mt-2 block px-2.5 py-1.5 rounded text-[11px] font-bold text-black bg-yellow-400 hover:bg-yellow-300 transition-colors"
-                        >
-                          Betaal {p.price.split("/")[0].split("·")[0].trim()}
-                        </a>
-                      )}
+                      <button
+                        onClick={() => void startCheckout(p.id)}
+                        disabled={Boolean(pendingPlan)}
+                        className="mt-2 w-full px-2.5 py-1.5 rounded text-[11px] font-bold text-black bg-yellow-400 hover:bg-yellow-300 transition-colors disabled:opacity-60 flex items-center justify-center gap-1"
+                      >
+                        {pendingPlan === p.id && <LoaderCircle className="w-3 h-3 animate-spin" aria-hidden />}
+                        {pendingPlan === p.id ? "Openen…" : `Kies ${p.label}`}
+                      </button>
                     </div>
                   ))}
+                </div>
+                {checkoutError && (
+                  <p className="text-[12px] text-red-300 glass rounded border border-red-400/25 p-3 -mt-2 mb-4" role="alert">
+                    {checkoutError}{" "}
+                    <a href="mailto:partners@apexclusive.nl" className="underline hover:text-white">
+                      Neem contact op
+                    </a>
+                    .
+                  </p>
+                )}
+                <div className="text-[10px] text-slate-600 text-center -mt-2 mb-5 leading-relaxed">
+                  <p className="flex items-center justify-center gap-1.5">
+                    <ShieldCheck className="w-3 h-3" aria-hidden />
+                    Veilige checkout via Stripe · promotiecodes worden in de checkout toegepast
+                  </p>
+                  <p className="mt-1">
+                    Bekijk vóór betaling de{" "}
+                    <Link href="/voorwaarden" className="underline hover:text-yellow-300">voorwaarden</Link>,{" "}
+                    <Link href="/privacy" className="underline hover:text-yellow-300">privacyuitleg</Link> en{" "}
+                    <Link href="/herroepen" className="underline hover:text-yellow-300">bedenktijd</Link>.
+                  </p>
                 </div>
 
                 {/* voordelen: supporter + pro */}
@@ -308,30 +442,21 @@ export default function ProDialog({
                   </div>
                 </div>
 
-                {/* proefmaand */}
-                <div className="glass rounded border border-white/10 p-3.5 mb-4 flex items-center gap-3">
-                  <Gift className="w-5 h-5 text-yellow-300 shrink-0" aria-hidden />
-                  <p className="text-[13px] text-slate-300 leading-snug">
-                    <b>Eerste maand gratis proberen?</b> Gebruik code{" "}
-                    <code className="bg-yellow-400/15 text-yellow-300 px-1.5 py-0.5 rounded font-bold">
-                      APEXPROEF
-                    </code>{" "}
-                    — volledig Pro, 30 dagen, daarna gewoon Basis als je niets doet.
-                  </p>
-                </div>
-
-                {/* betalen */}
-                {!anyCheckoutConfigured() && (
-                  <p className="text-[12px] text-slate-500 glass rounded border border-white/10 p-3 mb-3 leading-relaxed">
-                    Betalen loopt via Stripe zodra de betaallink is geconfigureerd
-                    (<code>NEXT_PUBLIC_STRIPE_LINK</code>). Tot die tijd werken de
-                    activatiecodes — demo&apos;s:{" "}
-                    <b className="text-yellow-400">APEXSUPPORT</b> ·{" "}
-                    <b className="text-yellow-400">APEXPRO</b> ·{" "}
-                    <b className="text-yellow-400">APEXPROEF</b>.
-                  </p>
+                {DEMO_CODES_ENABLED && (
+                  <div className="glass rounded border border-white/10 p-3.5 mb-4 flex items-center gap-3">
+                    <Gift className="w-5 h-5 text-yellow-300 shrink-0" aria-hidden />
+                    <p className="text-[13px] text-slate-300 leading-snug">
+                      <b>Previewmodus:</b> test 30 dagen Pro met code{" "}
+                      <code className="bg-yellow-400/15 text-yellow-300 px-1.5 py-0.5 rounded font-bold">
+                        APEXPROEF
+                      </code>
+                      . Demo-codes worden niet geaccepteerd in productie.
+                    </p>
+                  </div>
                 )}
 
+                {DEMO_CODES_ENABLED && (
+                  <>
                 {/* registratie bij proefmaand */}
                 {pendingCode && (
                   <div className="glass rounded border border-yellow-400/30 p-4 mb-4">
@@ -402,10 +527,12 @@ export default function ProDialog({
                   </button>
                 </div>
                 {error && <p className="text-[12px] text-red-400 mt-2">{error}</p>}
+                  </>
+                )}
 
                 <p className="text-[11px] text-slate-600 mt-4 text-center">
                   De gratis versie blijft volledig werken — elke vorm van steun is
-                  vrijwillig en gaat rechtstreeks in betere data.
+                  vrijwillig en helpt de planner en data beter te maken.
                 </p>
               </>
             )}

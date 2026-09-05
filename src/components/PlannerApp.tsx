@@ -10,6 +10,7 @@ import {
   setPendingPrompt,
   registerFileLaunchHandler,
   hasPendingRouteFile,
+  promptFromSearch,
 } from "@/lib/filehandoff";
 import { isRouteFileName } from "@/lib/routing";
 
@@ -28,13 +29,15 @@ export default function PlannerApp() {
     setStarted(true);
   };
 
-  // terug van /ontdek (of een ?rit-link): gelijk door naar de planner als er
-  // iets klaarstaat — via rAF, niet synchroon in het effect (React-compiler)
+  // Terug van een gids, zoekresultaat of gedeelde `?plan=`-link: zet de
+  // opdracht vóór het openen klaar. De URL is de duurzame fallback wanneer
+  // een harde navigatie de modulebuffer heeft geleegd.
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const hasRit =
-      hasPendingRouteFile() ||
-      new URLSearchParams(window.location.search).has("rit");
+    const query = new URLSearchParams(window.location.search);
+    const prompt = promptFromSearch(window.location.search);
+    if (prompt) setPendingPrompt(prompt);
+    const hasRit = hasPendingRouteFile() || Boolean(prompt) || query.has("rit");
     if (hasRit) {
       const r = requestAnimationFrame(() => setStarted(true));
       return () => cancelAnimationFrame(r);

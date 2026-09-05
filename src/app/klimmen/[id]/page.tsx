@@ -24,9 +24,25 @@ export async function generateMetadata({
   const { id } = await params;
   const c = CLIMBS.find((x) => x.id === id);
   if (!c) return {};
+  const title = `${c.name} (${c.place}) — ${kmLabel(c.lengthM)} km aan ${c.avgPct}% · Apex Routes`;
+  const description = `${c.name}: ${kmLabel(c.lengthM)} km, gemiddeld ${c.avgPct}%, maximaal ${c.maxPct}%, ${c.elevationM} hoogtemeters${c.surface === "asfalt" ? "" : `, ${c.surface}`}. ${c.note} Plan direct een rit over de ${c.name}.`;
   return {
-    title: `${c.name} (${c.place}) — ${kmLabel(c.lengthM)} km aan ${c.avgPct}% · Apex Routes`,
-    description: `${c.name}: ${kmLabel(c.lengthM)} km, gemiddeld ${c.avgPct}%, maximaal ${c.maxPct}%, ${c.elevationM} hoogtemeters${c.surface === "asfalt" ? "" : `, ${c.surface}`}. ${c.note} Plan direct een rit over de ${c.name}.`,
+    title,
+    description,
+    alternates: { canonical: `/klimmen/${c.id}` },
+    openGraph: {
+      title,
+      description,
+      url: `/klimmen/${c.id}`,
+      type: "article",
+      images: [{ url: `/klimmen/${c.id}/opengraph-image`, width: 1200, height: 630, alt: `${c.name} — beklimming bij ${c.place}` }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [`/klimmen/${c.id}/opengraph-image`],
+    },
   };
 }
 

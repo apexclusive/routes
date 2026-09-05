@@ -1,7 +1,11 @@
 /**
- * Bestands-overdracht binnen de app: een routebestand dat op de landing wordt
- * gekozen (of via de PWA "openen met" binnenkomt) moet door de planner worden
- * verwerkt zodra die mount. Simpele module-buffer + event, geen state-bureau.
+ * Bestands- en promptoverdracht binnen de app.
+ *
+ * Bestanden leven bewust alleen in het geheugen (een File hoort niet in
+ * localStorage). Planner-opdrachten krijgen daarnaast twee duurzame routes:
+ * sessionStorage voor navigatie binnen dezelfde tab én een deelbare `?plan=`
+ * URL. Daardoor werkt "Plan deze rit" ook na een harde paginanavigatie en kan
+ * een planner-link rechtstreeks vanuit zoekresultaten of een bericht openen.
  */
 
 interface PendingRouteFile {
@@ -31,23 +35,67 @@ export function consumePendingRouteFile(): PendingRouteFile | null {
   return p;
 }
 
-/* ---------- prompt-overdracht (bijv. Route Roulette op de landing) ---------- */
+/* ---------- prompt-overdracht (roulette, atlas, ritten en klimmen) ---------- */
 
 let pendingPrompt: string | null = null;
 
 export const PENDING_PROMPT_EVENT = "apex:pending-prompt";
+export const PENDING_PROMPT_KEY = "apex-routes:pending-prompt";
+export const PLAN_QUERY_PARAM = "plan";
+export const MAX_PROMPT_LENGTH = 500;
+
+/** Schoont een externe planner-opdracht op en begrenst de URL/API-invoer. */
+export function cleanPlannerPrompt(value: unknown): string {
+  return typeof value === "string"
+    ? value.trim().replace(/\s+/g, " ").slice(0, MAX_PROMPT_LENGTH)
+    : "";
+}
+
+/** Bouwt een echte, deelbare one-click link naar de planner. */
+export function plannerUrl(prompt: string): string {
+  const clean = cleanPlannerPrompt(prompt);
+  if (!clean) return "/?rit=1";
+  const params = new URLSearchParams({ [PLAN_QUERY_PARAM]: clean });
+  return `/?${params.toString()}`;
+}
+
+/** Leest uitsluitend de expliciete `plan`-parameter uit een querystring. */
+export function promptFromSearch(search: string): string {
+  try {
+    const value = new URLSearchParams(search).get(PLAN_QUERY_PARAM);
+    return cleanPlannerPrompt(value);
+  } catch {
+    return "";
+  }
+}
 
 export function setPendingPrompt(text: string): void {
-  pendingPrompt = text;
+  const clean = cleanPlannerPrompt(text);
+  if (!clean) return;
+  pendingPrompt = clean;
   if (typeof window !== "undefined") {
+    try {
+      window.sessionStorage.setItem(PENDING_PROMPT_KEY, clean);
+    } catch {
+      // Opslag kan in privémodus geblokkeerd zijn; de modulebuffer/URL blijft werken.
+    }
     window.dispatchEvent(new CustomEvent(PENDING_PROMPT_EVENT));
   }
 }
 
 export function consumePendingPrompt(): string | null {
-  const p = pendingPrompt;
+  let value = pendingPrompt;
   pendingPrompt = null;
-  return p;
+
+  if (typeof window !== "undefined") {
+    try {
+      value ||= cleanPlannerPrompt(window.sessionStorage.getItem(PENDING_PROMPT_KEY));
+      window.sessionStorage.removeItem(PENDING_PROMPT_KEY);
+    } catch {
+      // De modulebuffer is dan de fallback.
+    }
+  }
+  return value || null;
 }
 
 /** window.launchQueue (PWA file handling): bestand vanuit het OS openen. */

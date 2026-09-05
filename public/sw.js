@@ -9,7 +9,7 @@
  *    veranderen nooit onder dezelfde URL;
  *  - API-calls en kaarttegels nooit cachen — die horen vers te zijn.
  */
-const VERSION = "v42";
+const VERSION = "v44";
 const SHELL_CACHE = `apex-shell-${VERSION}`;
 const ASSET_CACHE = `apex-assets-${VERSION}`;
 
@@ -60,8 +60,10 @@ self.addEventListener("fetch", (event) => {
         (hit) =>
           hit ||
           fetch(request).then((response) => {
-            const copy = response.clone();
-            caches.open(ASSET_CACHE).then((cache) => cache.put(request, copy));
+            if (response.ok && response.type === "basic") {
+              const copy = response.clone();
+              caches.open(ASSET_CACHE).then((cache) => cache.put(request, copy));
+            }
             return response;
           })
       )
@@ -69,16 +71,29 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // paginanavigatie: netwerk eerst, cache als vangnet bij geen verbinding
+  // Paginanavigatie: netwerk eerst, exact dezelfde pagina als offline-fallback.
+  // Schrijf een subpagina nooit onder `/` weg — anders kon een bezoek aan
+  // /kalender de offline homepage per ongeluk vervangen.
   if (request.mode === "navigate") {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          const copy = response.clone();
-          caches.open(SHELL_CACHE).then((cache) => cache.put("/", copy));
+          // Querylinks kunnen routeplannen, campagnecodes of billing-status
+          // bevatten. Bewaar die URL's niet blijvend in de Cache API.
+          if (!url.search && response.ok && response.type === "basic") {
+            const copy = response.clone();
+            caches.open(SHELL_CACHE).then((cache) => cache.put(request, copy));
+          }
           return response;
         })
-        .catch(() => caches.match("/").then((hit) => hit || Response.error()))
+        .catch(async () => {
+          const exact = await caches.match(request);
+          if (exact) return exact;
+          // Voor querylinks (zoals ?plan=) mag de statische pagina-variant dienen.
+          const withoutQuery = await caches.match(url.pathname);
+          if (withoutQuery) return withoutQuery;
+          return (await caches.match("/")) || Response.error();
+        })
     );
   }
 });

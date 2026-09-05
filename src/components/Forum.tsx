@@ -722,8 +722,8 @@ export default function Forum() {
           </Link>
         </p>
         <p className="text-[12px] text-slate-600 mt-2">
-          Steun ons — elke euro gaat in betere kaart- en routedata.{" "}
-          <Link href="/#pricing" className="underline underline-offset-2 hover:text-yellow-400">
+          Steun ons — je bijdrage helpt routingcapaciteit, datakwaliteit en routeonderzoek betalen.{" "}
+          <Link href="/prijzen" className="underline underline-offset-2 hover:text-yellow-400">
             Bekijk de lagen
           </Link>
         </p>

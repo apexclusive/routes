@@ -626,8 +626,10 @@ export interface MatchedTrack {
   /** true = via OSRM /match op het wegenraster gelegd; false = benadering. */
   matched: boolean;
   confidence?: number | null;
-  /** true = ook de benadering viel terug op een schatting. */
+  /** true = duur of wegverloop is niet door een routing-engine bevestigd. */
   estimated?: boolean;
+  /** true = de geüploade trackvorm is behouden in plaats van herberekend. */
+  preserved?: boolean;
 }
 
 /** Uniform sample op afstand: behoudt start/eind en de vorm bij wisselende dichtheid. */
@@ -651,10 +653,39 @@ export function sampleByDistance(points: Coordinates[], max: number): Coordinate
   return out;
 }
 
+/** Houdt een geldige upload bruikbaar als een wegrouter geen betrouwbare match geeft. */
+export function preserveImportedTrack(
+  points: Coordinates[],
+  vehicle: VehicleType = "car"
+): MatchedTrack | null {
+  if (points.length < 2) return null;
+  let distance = 0;
+  for (let i = 1; i < points.length; i++) {
+    distance += haversineKm(points[i - 1], points[i]) * 1000;
+  }
+  const speedKmh =
+    vehicle === "bicycle" ? 18 : vehicle === "pedestrian" ? 4.5 : vehicle === "motorcycle" ? 65 : 55;
+  const geometryPoints = sampleByDistance(points, 2500);
+  return {
+    geometry: {
+      type: "LineString",
+      coordinates: geometryPoints.map((point) => [point.lng, point.lat] as GeoJSON.Position),
+    },
+    distance,
+    duration: distance > 0 ? (distance / 1000 / speedKmh) * 3600 : 0,
+    legs: [],
+    matched: false,
+    estimated: true,
+    preserved: true,
+  };
+}
+
 /**
  * Legt een geüploade track (GPX/KML/GeoJSON) op het echte wegenraster.
- * Eerst via OSRM /match (100 punten); lukt dat niet, dan waypoint-routing
- * over 25 bemonsterde punten; lukt dát ook niet, null.
+ * Auto en motor gaan eerst via OSRM /match (100 punten). Voor fiets en
+ * wandelen slaan we die driving-only matcher bewust over. Daarna proberen we
+ * voertuig-specifieke waypoint-routing. Geeft ook die slechts een schatting,
+ * dan bewaren we liever de originele trackvorm dan hem te vervormen.
  */
 export async function matchTrackToRoads(
   points: Coordinates[],
@@ -662,44 +693,49 @@ export async function matchTrackToRoads(
 ): Promise<MatchedTrack | null> {
   if (points.length < 2) return null;
 
-  try {
-    const sampled = sampleByDistance(points, 100);
-    const pts = sampled
-      .map((p) => `${p.lng.toFixed(6)},${p.lat.toFixed(6)}`)
-      .join(";");
-    const res = await fetch(`/api/match?points=${encodeURIComponent(pts)}`);
-    if (res.ok) {
-      const data = await res.json();
-      if (data.code === "Ok" && data.route?.geometry) {
-        return {
-          geometry: data.route.geometry as GeoJSON.LineString,
-          distance: data.route.distance as number,
-          duration: data.route.duration as number,
-          legs: data.route.legs ?? [],
-          matched: true,
-          confidence: data.confidence ?? null,
-        };
+  if (vehicle === "car" || vehicle === "motorcycle") {
+    try {
+      const sampled = sampleByDistance(points, 100);
+      const pts = sampled
+        .map((p) => `${p.lng.toFixed(6)},${p.lat.toFixed(6)}`)
+        .join(";");
+      const res = await fetch(`/api/match?points=${encodeURIComponent(pts)}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.code === "Ok" && data.route?.geometry) {
+          return {
+            geometry: data.route.geometry as GeoJSON.LineString,
+            distance: data.route.distance as number,
+            duration: data.route.duration as number,
+            legs: data.route.legs ?? [],
+            matched: true,
+            confidence: data.confidence ?? null,
+          };
+        }
       }
+    } catch {
+      /* val terug op voertuig-specifieke waypoint-routing */
     }
-  } catch {
-    /* val terug op waypoint-routing */
   }
 
   try {
     const r = await calculateRoute(sampleByDistance(points, MAX_WAYPOINTS), {
       vehicleType: vehicle,
     });
-    return {
-      geometry: r.geometry,
-      distance: r.distance,
-      duration: r.duration,
-      legs: r.legs,
-      matched: false,
-      estimated: Boolean(r.estimated),
-    };
+    if (!r.estimated) {
+      return {
+        geometry: r.geometry,
+        distance: r.distance,
+        duration: r.duration,
+        legs: r.legs,
+        matched: false,
+        estimated: false,
+      };
+    }
   } catch {
-    return null;
+    /* bewaar hieronder de oorspronkelijke track */
   }
+  return preserveImportedTrack(points, vehicle);
 }
 
 /* ---------- optionele AI-laag (server route /api/parse) ---------- */

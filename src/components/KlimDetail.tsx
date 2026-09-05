@@ -1,15 +1,15 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { Mountain, Copy, Check, BedDouble, Road, ArrowLeft } from "lucide-react";
+import { Mountain, BedDouble, Road, ArrowLeft, Route as RouteIcon } from "lucide-react";
 import Logo from "./Logo";
 import SiteMenu from "./SiteMenu";
 import LangSwitch from "./LangSwitch";
 import ScrollProgress from "./ScrollProgress";
 import SkipLink from "./SkipLink";
 import { CLIMBS, type Climb, type EventCountry } from "@/lib/climbs";
-import { bookingSearchUrl } from "@/lib/monetize";
+import { plannerUrl, setPendingPrompt } from "@/lib/filehandoff";
+import TripExtras from "./TripExtras";
 import ShareButton from "./ShareButton";
 import DeelKaart from "./DeelKaart";
 import { buildKlimFaq } from "@/lib/faq";
@@ -27,7 +27,6 @@ const LAND_NAAM: Record<EventCountry, string> = {
 };
 
 export default function KlimDetail({ klim }: { klim: Climb }) {
-  const [copied, setCopied] = useState(false);
   const km = (klim.lengthM / 1000).toFixed(1).replace(".", ",");
   const zwaarste = CLIMBS.reduce((a, b) => (b.elevationM > a.elevationM ? b : a));
   const zwaartePct = Math.round((klim.elevationM / zwaarste.elevationM) * 100);
@@ -36,16 +35,9 @@ export default function KlimDetail({ klim }: { klim: Climb }) {
     (c) => c.country === klim.country && c.id !== klim.id
   ).slice(0, 6);
 
-  const planRit = async () => {
-    try {
-      await navigator.clipboard.writeText(klim.prompt);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2400);
-    } catch {
-      // klembord geblokkeerd — prompt tonen werkt overal
-      window.prompt("Kopieer deze opdracht voor de planner:", klim.prompt);
-    }
-    window.open("/", "_self");
+  const planRit = () => {
+    setPendingPrompt(klim.prompt);
+    window.location.assign(plannerUrl(klim.prompt));
   };
 
   return (
@@ -147,24 +139,19 @@ export default function KlimDetail({ klim }: { klim: Climb }) {
 
         <p className="text-slate-400 text-[15px] leading-relaxed mb-8 max-w-2xl">{klim.note}</p>
 
-        <div className="flex flex-wrap gap-2.5 mb-12">
+        <div className="flex flex-wrap gap-2.5 mb-6">
           <button
-            onClick={() => void planRit()}
+            onClick={planRit}
+            data-track="Planner gestart"
+            data-track-source="klim-detail"
             className="btn-brand px-5 py-3 rounded font-semibold text-[14px] flex items-center gap-2"
           >
-            {copied ? <Check className="w-4 h-4" aria-hidden /> : <Copy className="w-4 h-4" aria-hidden />}
-            {copied ? "Opdracht gekopieerd" : "Plan rit over deze klim"}
+            <RouteIcon className="w-4 h-4" aria-hidden />
+            Plan direct over deze klim
           </button>
-          <a
-            href={bookingSearchUrl(klim.place)}
-            target="_blank"
-            rel="noopener noreferrer sponsored"
-            className="glass border border-white/10 hover:border-yellow-400/50 px-5 py-3 rounded font-semibold text-[14px] flex items-center gap-2 transition-colors"
-          >
-            <BedDouble className="w-4 h-4 text-yellow-300" aria-hidden />
-            Verblijf bij {klim.place}
-          </a>
         </div>
+
+        <TripExtras place={klim.place} context="klim" />
 
         <div className="mb-12">
           <p className="text-[11px] uppercase tracking-widest text-slate-500 mb-2">Deel deze klim</p>

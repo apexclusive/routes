@@ -20,9 +20,25 @@ export async function generateMetadata({
   const { id } = await params;
   const r = RITTEN.find((x) => x.id === id);
   if (!r) return {};
+  const title = `${r.naam} (${r.regio}) — ${r.lengthKm} km dagrit · Apex Routes`;
+  const description = `${r.naam}: ${r.lengthKm} km in ${r.rijmin >= 60 ? Math.floor(r.rijmin / 60) : 1} uur rijden door ${r.regio}. Hoogtepunten: ${r.hoogtepunten.join(", ")}. Plan de rit direct of boek je verblijf in ${r.plaats}.`;
   return {
-    title: `${r.naam} (${r.regio}) — ${r.lengthKm} km dagrit · Apex Routes`,
-    description: `${r.naam}: ${r.lengthKm} km in ${r.rijmin >= 60 ? Math.floor(r.rijmin / 60) : 1} uur rijden door ${r.regio}. Hoogtepunten: ${r.hoogtepunten.join(", ")}. Plan de rit direct of boek je verblijf in ${r.plaats}.`,
+    title,
+    description,
+    alternates: { canonical: `/ritten/${r.id}` },
+    openGraph: {
+      title,
+      description,
+      url: `/ritten/${r.id}`,
+      type: "article",
+      images: [{ url: `/ritten/${r.id}/opengraph-image`, width: 1200, height: 630, alt: `${r.naam} — ${r.lengthKm} km door ${r.regio}` }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [`/ritten/${r.id}/opengraph-image`],
+    },
   };
 }
 

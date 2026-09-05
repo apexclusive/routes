@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { Route as RouteIcon, Copy, Check, BedDouble, Mountain, ArrowLeft } from "lucide-react";
+import { Route as RouteIcon, BedDouble, Mountain, ArrowLeft } from "lucide-react";
 import Logo from "./Logo";
 import LangSwitch from "./LangSwitch";
 import ScrollProgress from "./ScrollProgress";
@@ -14,7 +13,8 @@ import { buildRitFaq } from "@/lib/faq";
 import { ChevronDown } from "lucide-react";
 import { RITTEN, type Rit, type EventCountry } from "@/lib/ritten";
 import { CLIMBS } from "@/lib/climbs";
-import { bookingSearchUrl } from "@/lib/monetize";
+import { plannerUrl, setPendingPrompt } from "@/lib/filehandoff";
+import TripExtras from "./TripExtras";
 
 const LAND_NAAM: Record<EventCountry, string> = {
   NL: "Nederland",
@@ -28,7 +28,6 @@ const LAND_NAAM: Record<EventCountry, string> = {
 };
 
 export default function RitDetail({ rit }: { rit: Rit }) {
-  const [copied, setCopied] = useState(false);
   const klimmen = rit.klimIds
     .map((id) => CLIMBS.find((c) => c.id === id))
     .filter((c): c is NonNullable<typeof c> => Boolean(c));
@@ -36,15 +35,9 @@ export default function RitDetail({ rit }: { rit: Rit }) {
   const faq = buildRitFaq(rit);
   const rijtijd = `${Math.floor(rit.rijmin / 60)}:${String(rit.rijmin % 60).padStart(2, "0")}`;
 
-  const planRit = async () => {
-    try {
-      await navigator.clipboard.writeText(rit.prompt);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2400);
-    } catch {
-      window.prompt("Kopieer deze opdracht voor de planner:", rit.prompt);
-    }
-    window.open("/", "_self");
+  const planRit = () => {
+    setPendingPrompt(rit.prompt);
+    window.location.assign(plannerUrl(rit.prompt));
   };
 
   return (
@@ -148,24 +141,19 @@ export default function RitDetail({ rit }: { rit: Rit }) {
           </div>
         )}
 
-        <div className="flex flex-wrap gap-2.5 mb-4">
+        <div className="flex flex-wrap gap-2.5 mb-6">
           <button
-            onClick={() => void planRit()}
+            onClick={planRit}
+            data-track="Planner gestart"
+            data-track-source="rit-detail"
             className="btn-brand px-5 py-3 rounded font-semibold text-[14px] flex items-center gap-2"
           >
-            {copied ? <Check className="w-4 h-4" aria-hidden /> : <Copy className="w-4 h-4" aria-hidden />}
-            {copied ? "Opdracht gekopieerd" : "Plan deze rit"}
+            <RouteIcon className="w-4 h-4" aria-hidden />
+            Plan direct in de planner
           </button>
-          <a
-            href={bookingSearchUrl(rit.plaats)}
-            target="_blank"
-            rel="noopener noreferrer sponsored"
-            className="glass border border-white/10 hover:border-yellow-400/50 px-5 py-3 rounded font-semibold text-[14px] flex items-center gap-2 transition-colors"
-          >
-            <BedDouble className="w-4 h-4 text-yellow-300" aria-hidden />
-            Verblijf in {rit.plaats}
-          </a>
         </div>
+
+        <TripExtras place={rit.plaats} context="rit" />
 
         <div className="mb-12">
           <p className="text-[11px] uppercase tracking-widest text-slate-500 mb-2">Deel deze rit</p>

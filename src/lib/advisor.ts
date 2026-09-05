@@ -240,7 +240,7 @@ export const HOTEL_TIPS: string[] = [
 /* ---------- apps & gadgets ---------- */
 
 export const APP_TIPS: { name: string; what: string }[] = [
-  { name: "Apex Routes", what: "Route bouwen via chat, GPX/FIT importeren, demo-rit vooraf, export naar elke navigatie-app." },
+  { name: "Apex Routes", what: "Route bouwen via chat, GPX/FIT importeren, vooraf controleren en openen in Maps/Waze of exporteren als GPX." },
   { name: "Google Maps", what: "Navigatie met onze slimme ankers; werkt offline met gedownloade regio's." },
   { name: "OsmAnd", what: "OpenStreetMap-navigatie met GPX-import, volledig offline." },
   { name: "Kurviger", what: "Kronkelroute-navigatie die snelwegen vermijdt — favoriet bij motorrijders." },
@@ -292,7 +292,7 @@ export const APP_GUIDE: AppGuideRow[] = [
       { name: "Google Maps", why: "Beste verkeersinfo en onze slimme ankers (max 11, exact op de weg) — geen U-turn-POI's." },
       { name: "Waze", why: "Politie- en gevarenmeldingen onderweg; minder mooi, wel scherp." },
     ],
-    apex: "Kies in de samenvatting 'Google Maps' of 'Waze' — de ankers worden meegegeven.",
+    apex: "Kies in de samenvatting 'Google Maps' of 'Waze'. Google Maps krijgt slimme route-ankers; Waze opent de bestemming.",
   },
   {
     profile: "Motor",
@@ -301,7 +301,7 @@ export const APP_GUIDE: AppGuideRow[] = [
       { name: "Kurviger", why: "Bouwt zelf kronkelroutes en vermijdt snelwegen; importeert onze GPX met afslagen." },
       { name: "Calimoto / REVER", why: "Curated motortochten en tracking van je gereden kilometers." },
     ],
-    apex: "Download de GPX (met turn-by-turn) en importeer die in Kurviger of Calimoto.",
+    apex: "Download de standaard-GPX met routelijn en beschikbare afslagpunten; controleer na import hoe je app die interpreteert.",
   },
   {
     profile: "Fiets & racefiets",
@@ -310,7 +310,7 @@ export const APP_GUIDE: AppGuideRow[] = [
       { name: "Komoot", why: "Kent oppervlak en wegtype; het hoogteprofiel is sterk." },
       { name: "OsmAnd", why: "Volledig offline met GPX-import — fijn in de Ardennen zonder bereik." },
     ],
-    apex: "Plan de fietsroute in Apex (ORS-routing) en exporteer de GPX naar je app.",
+    apex: "Plan de fietsroute in Apex en exporteer de standaard-GPX naar een compatibele app.",
   },
   {
     profile: "Wandelen",
@@ -328,7 +328,7 @@ export const APP_GUIDE: AppGuideRow[] = [
       { name: "Apex Routes (deze site)", why: "Installeren als app (PWA): offline shell, bestanden openen met 'openen met'." },
       { name: "Strava", why: "Segmenten op klimmen als de Cauberg — voor als het toch een wedstrijdje wordt." },
     ],
-    apex: "Alles wat je hier plant, exporteer je met één tik naar elke app hierboven.",
+    apex: "Open direct in Google Maps of Waze, of download GPX voor een compatibele navigatie-app.",
   },
 ];
 

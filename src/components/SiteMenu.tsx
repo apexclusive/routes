@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -18,6 +18,7 @@ import {
   ClipboardCheck,
   FileDown,
   Megaphone,
+  Crown,
 } from "lucide-react";
 import { SITE_LINKS, SITE_GROEPEN } from "@/lib/nav";
 
@@ -32,6 +33,7 @@ const ICONEN = {
   ritbank: Archive,
   checklist: ClipboardCheck,
   gpx: FileDown,
+  pricing: Crown,
   adverteren: Megaphone,
 } as const;
 
@@ -41,11 +43,52 @@ const ICONEN = {
  */
 export default function SiteMenu() {
   const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
   const pathname = usePathname();
+
+  useEffect(() => {
+    if (!open) return;
+    const previousOverflow = document.body.style.overflow;
+    const trigger = triggerRef.current;
+    document.body.style.overflow = "hidden";
+    const frame = requestAnimationFrame(() => {
+      panelRef.current?.querySelector<HTMLElement>("[data-menu-close]")?.focus();
+    });
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setOpen(false);
+        return;
+      }
+      if (event.key !== "Tab" || !panelRef.current) return;
+      const items = Array.from(
+        panelRef.current.querySelectorAll<HTMLElement>('button:not([disabled]), a[href]')
+      );
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      cancelAnimationFrame(frame);
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKey);
+      trigger?.focus();
+    };
+  }, [open]);
 
   return (
     <>
       <button
+        ref={triggerRef}
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-label="Site-menu"
@@ -64,6 +107,9 @@ export default function SiteMenu() {
             onClick={() => setOpen(false)}
           >
             <motion.nav
+              ref={panelRef}
+              role="dialog"
+              aria-modal="true"
               initial={{ x: 24, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: 24, opacity: 0 }}
@@ -76,6 +122,7 @@ export default function SiteMenu() {
                 <p className="eyebrow">APEX ROUTES</p>
                 <button
                   onClick={() => setOpen(false)}
+                  data-menu-close
                   aria-label="Menu sluiten"
                   className="w-9 h-9 rounded glass border border-white/10 flex items-center justify-center"
                 >
@@ -111,7 +158,12 @@ export default function SiteMenu() {
                 </div>
               ))}
 
-              <p className="text-[10px] text-slate-600 mt-6 leading-relaxed">
+              <div className="mt-6 pt-4 border-t border-white/[0.08] flex flex-wrap gap-x-4 gap-y-2 text-[11px] text-slate-500">
+                <Link href="/privacy" onClick={() => setOpen(false)} className="hover:text-yellow-300">Privacy</Link>
+                <Link href="/voorwaarden" onClick={() => setOpen(false)} className="hover:text-yellow-300">Voorwaarden</Link>
+                <Link href="/herroepen" onClick={() => setOpen(false)} className="hover:text-yellow-300">Aankoop herroepen</Link>
+              </div>
+              <p className="text-[10px] text-slate-600 mt-4 leading-relaxed">
                 routes.apexclusive.nl — planner, ritten, klimmen en kalender in
                 één hand.
               </p>

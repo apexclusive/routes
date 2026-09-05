@@ -3,7 +3,7 @@ export type SiteLink = {
   href: string;
   label: string;
   /** icoon-key, gemapt in SiteMenu */
-  icon: "planner" | "ritten" | "klimmen" | "kalender" | "forum" | "atlas" | "advisor" | "ritbank" | "checklist" | "gpx" | "adverteren";
+  icon: "planner" | "ritten" | "klimmen" | "kalender" | "forum" | "atlas" | "advisor" | "ritbank" | "checklist" | "gpx" | "pricing" | "adverteren";
   groep: "plannen" | "ontdekken" | "meer";
 };
 
@@ -18,6 +18,7 @@ export const SITE_LINKS: SiteLink[] = [
   { href: "/ritbank", label: "Ritbank", icon: "ritbank", groep: "meer" },
   { href: "/checklist", label: "Vertrek-checklist", icon: "checklist", groep: "meer" },
   { href: "/gpx", label: "GPX & bestanden", icon: "gpx", groep: "meer" },
+  { href: "/prijzen", label: "Prijzen & Apex Pro", icon: "pricing", groep: "meer" },
   { href: "/adverteren", label: "Adverteren", icon: "adverteren", groep: "meer" },
 ];
 

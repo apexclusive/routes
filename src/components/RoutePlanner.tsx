@@ -83,7 +83,8 @@ import { generateLoopWaypoints } from "@/lib/loopgen";
 import { fuelAdvice } from "@/lib/fuelrange";
 import { difficultyLevel } from "@/lib/difficulty";
 import { lineStringToCanvasPoints } from "@/lib/sharecard";
-import { bookingSearchUrl } from "@/lib/monetize";
+import { bookingSearchUrl, defaultTravelDates } from "@/lib/monetize";
+import { trackEvent } from "@/lib/analytics";
 import { fetchWeatherNow, weatherLabel, type WeatherNow } from "@/lib/weather";
 import {
   downloadGPX,
@@ -158,6 +159,8 @@ const VEHICLE_OPTIONS: { value: VehicleType; label: string }[] = [
   { value: "pedestrian", label: "Wandelen" },
 ];
 
+const MAX_IMPORT_BYTES = 15 * 1024 * 1024;
+
 let wpCounter = 0;
 function uid(prefix: string) {
   wpCounter += 1;
@@ -220,7 +223,7 @@ export default function RoutePlanner() {
   // ernaast (kaart blijft dan bruikbaar breed); standaard daar dicht
   const [isDesktop, setIsDesktop] = useState(true);
   // GPX/KML/GeoJSON-import: route volgt het bestand → Google-export gebruikt
-  // slimme ankers op de weg i.p.v. de (weinige) waypoints
+  // representatieve ankers uit de track i.p.v. alleen start en einde
   const [importedRoute, setImportedRoute] = useState(false);
   const [navAnchors, setNavAnchors] = useState<Coordinates[]>([]);
   const [showTurns, setShowTurns] = useState(false);
@@ -313,6 +316,11 @@ export default function RoutePlanner() {
     // Lidmaatschap en daggebruik uit de lokale opslag
     setProState(getProState());
     setUsage(getUsage());
+    const onProChange = (event: Event) => {
+      const detail = (event as CustomEvent<ProState>).detail;
+      setProState(detail && typeof detail.active === "boolean" ? detail : getProState());
+    };
+    window.addEventListener("apex:pro-change", onProChange);
     // gratis probe: is de optionele AI-laag op de server geconfigureerd?
     let alive = true;
     aiLayerConfigured().then((v) => {
@@ -328,6 +336,7 @@ export default function RoutePlanner() {
     mq.addEventListener("change", update);
     return () => {
       alive = false;
+      window.removeEventListener("apex:pro-change", onProChange);
       mq.removeEventListener("change", update);
     };
   }, []);
@@ -389,7 +398,13 @@ export default function RoutePlanner() {
         setRouteGeometry(newRoute.geometry);
         setImportedRoute(false);
         setNavAnchors([]);
+        trackEvent("Route berekend", {
+          vehicle: veh,
+          estimated: Boolean(routeData.estimated),
+          waypoint_count: Math.min(wps.length, 25),
+        });
       } catch (error) {
+        trackEvent("Routeberekening mislukt", { vehicle: veh });
         console.error("Route calculation failed:", error);
       } finally {
         setIsCalculating(false);
@@ -415,6 +430,11 @@ export default function RoutePlanner() {
       setVehicle(shared.vehicle);
       setWaypoints(wps);
       routeNameRef.current = shared.name;
+      trackEvent("Gedeelde route geopend", {
+        vehicle: shared.vehicle,
+        geometry: Boolean(shared.geometry),
+        imported: Boolean(shared.imported),
+      });
 
       if (shared.geometry) {
         // geometrie zat in de link → direct tonen, geen herberekening nodig
@@ -555,6 +575,7 @@ export default function RoutePlanner() {
             content: "Geopend in Google Maps — goede rit! ",
           },
         ]);
+        trackEvent("Navigatie geopend", { provider: "google_maps", vehicle });
         window.open(googleMapsUrl, "_blank", "noopener,noreferrer");
         return;
       }
@@ -582,9 +603,13 @@ export default function RoutePlanner() {
               {
                 id: uid("bot"),
                 role: "assistant",
-                content: `**Daglimiet bereikt** — in deze laag zijn dat ${limit} AI-routes per dag. Met **Supporter** (€2,99) krijg je er 10, met **Apex Pro** onbeperkt — en de eerste maand is gratis met code APEXPROEF. Je punten blijven staan; na activeren zeg je "bouw de route".`,
+                content: `**Daglimiet bereikt** — in deze laag zijn dat ${limit} AI-routes per dag. Met **Supporter** (€2,99/maand) krijg je er 10, met **Apex Pro** onbeperkt. Je punten blijven staan; kies een plan en zeg daarna opnieuw "bouw de route".`,
               },
             ]);
+            trackEvent("Prijsdialoog geopend", {
+              source: "ai_limit",
+              tier: tierOf(proState),
+            });
             setShowPro(true);
             return;
           }
@@ -599,6 +624,11 @@ export default function RoutePlanner() {
             setRoute(newContext.route);
             setRouteGeometry(newContext.route.geometry);
             setImportedRoute(false);
+            trackEvent("Route berekend", {
+              vehicle: newContext.vehicle,
+              estimated: newContext.route.engine === "manual",
+              waypoint_count: Math.min(newContext.waypoints.length, 25),
+            });
             setNavAnchors([]);
             if (tierOf(proState) !== "pro") setUsage(recordUse("aiRoutes"));
           }
@@ -607,7 +637,7 @@ export default function RoutePlanner() {
         setIsTyping(false);
       }
     },
-    [isTyping, navCoords, googleMapsUrl, usage, proState]
+    [isTyping, navCoords, googleMapsUrl, usage, proState, vehicle]
   );
 
   const handleQuickReply = useCallback(
@@ -818,10 +848,12 @@ export default function RoutePlanner() {
   const shareImage = useCallback(() => {
     if (!routeGeometry || typeof document === "undefined") return;
     const canvas = document.createElement("canvas");
-    canvas.width = 1200;
-    canvas.height = 630;
+    const pixelScale = tierOf(proState) === "pro" ? 2 : 1;
+    canvas.width = 1200 * pixelScale;
+    canvas.height = 630 * pixelScale;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+    ctx.scale(pixelScale, pixelScale);
 
     ctx.fillStyle = "#050507";
     ctx.fillRect(0, 0, 1200, 630);
@@ -916,8 +948,14 @@ export default function RoutePlanner() {
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
+      trackEvent("Route geëxporteerd", {
+        format: "png",
+        vehicle,
+        imported: importedRoute,
+        high_resolution: pixelScale === 2,
+      });
     }, "image/png");
-  }, [routeGeometry, route, waypoints.length, proState]);
+  }, [routeGeometry, route, waypoints.length, proState, vehicle, importedRoute]);
 
   /** Rondrit-generator: lus van ongeveer X km vanaf het eerste punt. */
   const handleGenerateLoop = useCallback(
@@ -1013,6 +1051,19 @@ export default function RoutePlanner() {
 
   const handleImportFile = useCallback(
     async (file: File) => {
+      const format = file.name.split(".").pop()?.toLowerCase().slice(0, 10) || "onbekend";
+      if (file.size > MAX_IMPORT_BYTES) {
+        trackEvent("Route import mislukt", { format, reason: "too_large" });
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: uid("bot"),
+            role: "assistant",
+            content: "Dit routebestand is groter dan 15 MB. Verklein of vereenvoudig de track en probeer opnieuw.",
+          },
+        ]);
+        return;
+      }
       // FIT is binair: eigen decoder; tekstformaten via parseRouteFile
       let coords: Coordinates[] | null = null;
       if (file.name.toLowerCase().endsWith(".fit")) {
@@ -1021,6 +1072,7 @@ export default function RoutePlanner() {
         coords = parseRouteFile(await file.text());
       }
       if (!coords || coords.length < 2) {
+        trackEvent("Route import mislukt", { format });
         setMessages((prev) => [
           ...prev,
           {
@@ -1089,6 +1141,26 @@ export default function RoutePlanner() {
         setShowTurns(turns.length > 0);
         setOrderBeforeOptimize(null);
         routeNameRef.current = newRoute.name;
+        trackEvent("Route geïmporteerd", {
+          format,
+          matched: Boolean(matched?.matched),
+          preserved: Boolean(matched?.preserved),
+          has_turns: turns.length > 0,
+        });
+
+        const matchLabel = matched?.matched
+          ? "op het wegenraster gelegd (map matching)"
+          : matched?.preserved
+            ? "oorspronkelijke trackvorm behouden; tijd is een schatting"
+            : matched
+              ? "via voertuig-specifieke routepunten herberekend"
+              : "track ingelezen zonder herberekening";
+        const mapsNote = anchors.length > 0
+          ? `Google Maps krijgt ${anchors.length} route-ankers en kan het wegverloop zelf herberekenen.`
+          : "Voor deze track zijn geen betrouwbare Google Maps-ankers beschikbaar.";
+        const gpxNote = turns.length > 0
+          ? "De GPX-download bevat de routelijn en de beschikbare afslagpunten."
+          : "De GPX-download behoudt de routelijn, maar bevat voor deze import geen afslagpunten.";
 
         setMessages((prev) => [
           ...prev,
@@ -1096,12 +1168,8 @@ export default function RoutePlanner() {
             id: uid("bot"),
             role: "assistant",
             content: `**${file.name} geïmporteerd!**\n\n${
-              matched ? formatDistance(matched.distance) : "?"
-            } · **${turns.length} afslagen** · ${
-              matched?.matched
-                ? "exact op het wegenraster gelegd (map matching)"
-                : "benaderd via routepunten"
-            }\n\n**Google Maps-navigatie** gebruikt ${anchors.length} slimme ankers die exact op de weg liggen (geen POI's, dus geen omkeer-trucs) — Google maakt daar zelf de afslagen van. Voor 100% exacte turn-by-turn: download de GPX (met afslaginstructies) en open die in OsmAnd, Kurviger, Calimoto of TomTom/Garmin.`,
+              matched ? formatDistance(matched.distance) : "Afstand onbekend"
+            } · **${turns.length} afslagen** · ${matchLabel}.\n\n${mapsNote} ${gpxNote} Navigatie-apps kunnen een GPX anders interpreteren; controleer de route vóór vertrek.`,
           },
         ]);
       } finally {
@@ -1121,15 +1189,24 @@ export default function RoutePlanner() {
         {
           id: uid("bot"),
           role: "assistant",
-          content: `**Exportlimiet bereikt** — in deze laag zijn dat ${limit} downloads per dag. Supporter geeft er 15, Pro onbeperkt (proefmaand gratis met APEXPROEF).`,
+          content: `**GPX-limiet bereikt** — in deze laag zijn dat ${limit} GPX-downloads per dag. Supporter geeft er 15; Pro maakt GPX-downloads onbeperkt. Je route blijft bewaard terwijl je kiest.`,
         },
       ]);
+      trackEvent("Prijsdialoog geopend", {
+        source: "export_limit",
+        tier: tierOf(proState),
+      });
       setShowPro(true);
       return;
     }
     downloadGPX(route?.name || "Route", waypoints, routeGeometry, route?.turns);
+    trackEvent("Route geëxporteerd", {
+      format: "gpx",
+      vehicle,
+      imported: importedRoute,
+    });
     if (tierOf(proState) !== "pro") setUsage(recordUse("exports"));
-  }, [route, waypoints, routeGeometry, usage, proState]);
+  }, [route, waypoints, routeGeometry, usage, proState, vehicle, importedRoute]);
 
   /** Route Roulette in de chat: het lot kiest, de wizard bouwt. */
   const handleRoulette = useCallback(() => {
@@ -1300,15 +1377,17 @@ export default function RoutePlanner() {
   const handleOpenWaze = useCallback(() => {
     if (waypoints.length === 0) return;
     const dest = waypoints[waypoints.length - 1].coordinates;
+    trackEvent("Navigatie geopend", { provider: "waze", vehicle });
     window.open(getWazeUrl(dest), "_blank", "noopener,noreferrer");
-  }, [waypoints]);
+  }, [waypoints, vehicle]);
 
   /** Printen: de afslagenlijst moet uitgeklapt zijn, anders staat 'ie niet in de DOM. */
   const handlePrint = useCallback(() => {
+    trackEvent("Route geëxporteerd", { format: "print_pdf", vehicle });
     setShowTurns(true);
     // één frame wachten zodat de lijst gerenderd is voor de printdialoog opent
     window.requestAnimationFrame(() => window.requestAnimationFrame(() => window.print()));
-  }, []);
+  }, [vehicle]);
 
   /* ---------- volgorde optimaliseren ---------- */
   const handleOptimizeOrder = useCallback(() => {
@@ -1381,6 +1460,11 @@ export default function RoutePlanner() {
         content: `**${name}** opgeslagen in deze browser. Je vindt 'm terug onder *Mijn routes*.`,
       },
     ]);
+    trackEvent("Route opgeslagen", {
+      vehicle,
+      imported: importedRoute,
+      badge_unlocked: fresh.length > 0,
+    });
     if (fresh.length > 0) {
       fireConfetti();
       const earned = BADGES.filter((b) => fresh.includes(b.id));
@@ -1441,9 +1525,11 @@ export default function RoutePlanner() {
     try {
       await navigator.clipboard.writeText(url);
       setShareState(geometryIncluded ? "copied" : "partial");
+      trackEvent("Route gedeeld", { method: "clipboard", geometry: geometryIncluded });
     } catch {
       // clipboard geweigerd (geen https of geen toestemming) → link in de chat
       setShareState("failed");
+      trackEvent("Route gedeeld", { method: "fallback", geometry: geometryIncluded });
       setMessages((prev) => [
         ...prev,
         {
@@ -1542,6 +1628,8 @@ export default function RoutePlanner() {
         />
         <button
           onClick={() => fileInputRef.current?.click()}
+          data-track="Route import gestart"
+          data-track-source="planner_toolbar"
           className="p-2 hover:bg-white/10 rounded transition-colors"
           title="GPX / KML / GeoJSON importeren"
           aria-label="Routebestand importeren"
@@ -1566,6 +1654,8 @@ export default function RoutePlanner() {
         </button>
         <button
           onClick={() => setShowPro(true)}
+          data-track="Prijsdialoog geopend"
+          data-track-source="planner_toolbar"
           className={`relative p-2 rounded transition-colors ${
             proState.active ? "pro-chip" : "hover:bg-white/10"
           }`}
@@ -2037,12 +2127,20 @@ export default function RoutePlanner() {
                               const doel =
                                 [...waypoints].reverse().find((w) => !/^(punt|luspunt|wp)/i.test(w.name))
                                   ?.name ?? waypoints[waypoints.length - 1].name;
-                              window.open(bookingSearchUrl(doel), "_blank", "noopener");
+                              window.open(
+                                bookingSearchUrl(doel, { ...defaultTravelDates(), adults: 2, rooms: 1 }),
+                                "_blank",
+                                "noopener,noreferrer"
+                              );
                             }}
+                            data-track="Affiliate klik"
+                            data-track-partner="booking"
+                            data-track-context="planner"
                             className="px-3 py-1.5 rounded text-[12px] font-semibold glass border border-white/10 hover:border-yellow-400/50 flex items-center gap-1.5 transition-colors"
                           >
                             <BedDouble className="w-3.5 h-3.5" aria-hidden />
                             {P.hotelBtn}
+                            <span className="text-[9px] uppercase tracking-wide text-slate-500">partner</span>
                           </button>
                         )}
                         <button
@@ -2204,6 +2302,9 @@ export default function RoutePlanner() {
                       href={googleMapsUrl}
                       target="_blank"
                       rel="noopener noreferrer"
+                      data-track="Navigatie geopend"
+                      data-track-provider="google_maps"
+                      data-track-vehicle={vehicle}
                       className="btn-ghost py-2.5 rounded font-semibold text-sm flex items-center justify-center gap-1.5"
                       title={
                         importedRoute && navAnchors.length >= 2
@@ -2264,6 +2365,11 @@ export default function RoutePlanner() {
                     referrerPolicy="no-referrer-when-downgrade"
                     title="Google Maps route"
                   />
+                )}
+                {tierOf(proState) === "free" && (
+                  <p className="hidden print:block mt-8 pt-3 border-t border-slate-300 text-[10px] text-slate-500">
+                    Routeboek gemaakt met Apex Routes Basis · routes.apexclusive.nl
+                  </p>
                 )}
               </motion.div>
             )}

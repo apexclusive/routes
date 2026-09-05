@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/metadata";
 import Discover from "@/components/Discover";
 import { breadcrumbSchema } from "@/lib/schema";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Ontdek routes — Apex Routes",
-  description:
-    "Top-10 motor- en autoroutes per land (NL · BE · LU · DE), mooie ritten naar circuits en rally-GPX van StreetGasm en meer.",
-};
+  description: "Route-inspiratie voor Nederland, België, Luxemburg en Duitsland, ritten naar circuits en evenementen waarvan organisatoren routebestanden aanbieden.",
+  path: "/ontdek",
+});
 
 export default function OntdekPage() {
   return (

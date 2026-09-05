@@ -3,13 +3,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Mountain, Copy, Check, Road } from "lucide-react";
+import { Mountain, Road, Route as RouteIcon } from "lucide-react";
 import Logo from "./Logo";
 import SiteMenu from "./SiteMenu";
 import LangSwitch from "./LangSwitch";
 import ScrollProgress from "./ScrollProgress";
 import SkipLink from "./SkipLink";
 import { CLIMBS, type EventCountry } from "@/lib/climbs";
+import { plannerUrl, setPendingPrompt } from "@/lib/filehandoff";
 
 const LANDEN: { id: EventCountry | "alle"; label: string }[] = [
   { id: "alle", label: "Alles" },
@@ -38,7 +39,6 @@ const SURFACE_LABEL: Record<string, string> = {
 export default function Klimbibliotheek() {
   const [land, setLand] = useState<EventCountry | "alle">("alle");
   const [surface, setSurface] = useState<(typeof SURFACES)[number]["id"]>("alle");
-  const [copied, setCopied] = useState<string | null>(null);
 
   const visible = CLIMBS.filter(
     (c) =>
@@ -46,15 +46,9 @@ export default function Klimbibliotheek() {
       (surface === "alle" || c.surface === surface)
   ).sort((a, b) => b.maxPct - a.maxPct);
 
-  const planRit = async (id: string, prompt: string) => {
-    try {
-      await navigator.clipboard.writeText(prompt);
-      setCopied(id);
-      window.setTimeout(() => setCopied(null), 2200);
-    } catch {
-      // klembord geblokkeerd — de planner opent toch
-    }
-    window.open("/", "_self");
+  const planRit = (prompt: string) => {
+    setPendingPrompt(prompt);
+    window.location.assign(plannerUrl(prompt));
   };
 
   return (
@@ -199,16 +193,14 @@ export default function Klimbibliotheek() {
                 {SURFACE_LABEL[c.surface]}
               </span>
               <button
-                onClick={() => void planRit(c.id, c.prompt)}
+                onClick={() => planRit(c.prompt)}
+                data-track="Planner gestart"
+                data-track-source="klimbibliotheek"
                 className="ml-auto px-3 py-2 rounded text-[12px] font-semibold text-yellow-300 border border-yellow-400/30 bg-yellow-400/[0.07] hover:bg-yellow-400/15 transition-colors flex items-center gap-1.5"
-                title="Kopieert de opdracht en opent de planner — plak in de chat"
+                title="Opent deze klim direct als opdracht in de planner"
               >
-                {copied === c.id ? (
-                  <Check className="w-3.5 h-3.5" aria-hidden />
-                ) : (
-                  <Copy className="w-3.5 h-3.5" aria-hidden />
-                )}
-                {copied === c.id ? "Gekopieerd — plak in de chat" : "Plan rit over deze klim"}
+                <RouteIcon className="w-3.5 h-3.5" aria-hidden />
+                Plan direct
               </button>
             </div>
           </motion.div>

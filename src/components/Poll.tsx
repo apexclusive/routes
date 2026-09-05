@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { BarChart3 } from "lucide-react";
-import { tally } from "@/lib/polls";
+import { Check, BarChart3, ShieldCheck } from "lucide-react";
 
 const PREFIX = "apex-routes:poll:";
 
-/** Eenvoudige peiling: stem lokaal, uitslag direct zichtbaar met balken. */
+/**
+ * Lokale peiling zonder verzonnen publiekscijfers. Een keuze wordt op dit
+ * apparaat onthouden; zodra centrale, privacyvriendelijke telling actief is
+ * kan dezelfde UI echte totalen tonen.
+ */
 export default function Poll({
   id,
   question,
@@ -25,26 +27,27 @@ export default function Poll({
     const r = requestAnimationFrame(() => {
       try {
         const raw = localStorage.getItem(PREFIX + id);
-        if (raw !== null) setChoice(Number(raw));
+        if (raw !== null) {
+          const parsed = Number(raw);
+          if (Number.isInteger(parsed) && parsed >= 0 && parsed < options.length) {
+            setChoice(parsed);
+          }
+        }
       } catch {
         /* privémodus */
       }
     });
     return () => cancelAnimationFrame(r);
-  }, [id]);
+  }, [id, options.length]);
 
   const vote = (i: number) => {
     setChoice(i);
     try {
       localStorage.setItem(PREFIX + id, String(i));
     } catch {
-      /* weg ermee */
+      /* de keuze blijft dan alleen voor deze sessie zichtbaar */
     }
   };
-
-  const localVotes = choice === null ? null : options.map((_, i) => (i === choice ? 1 : 0));
-  const result = tally(id, options, localVotes);
-  const voted = choice !== null;
 
   return (
     <div className={compact ? "glass rounded-[22px] border border-white/10 p-4" : "lux-card p-6"}>
@@ -53,51 +56,44 @@ export default function Poll({
         {question}
       </p>
       <div className="space-y-1.5">
-        {options.map((o, i) => {
-          const isWinner = voted && result.winner === i;
+        {options.map((option, i) => {
+          const selected = choice === i;
           return (
             <button
-              key={o}
+              key={option}
               onClick={() => vote(i)}
-              aria-pressed={choice === i}
-              className={`w-full text-left relative overflow-hidden rounded border px-3.5 py-2.5 transition-colors ${
-                choice === i
-                  ? "border-yellow-400/60"
-                  : voted
-                    ? "border-white/10"
-                    : "border-white/10 hover:border-white/30"
+              data-track="Peiling gestemd"
+              data-track-poll={id}
+              data-track-option={String(i + 1)}
+              aria-pressed={selected}
+              className={`w-full text-left rounded border px-3.5 py-2.5 transition-colors ${
+                selected
+                  ? "border-yellow-400/60 bg-yellow-400/[0.10] text-yellow-100"
+                  : "border-white/10 hover:border-white/30 text-slate-300"
               }`}
             >
-              {voted && (
-                <motion.span
-                  initial={{ width: 0 }}
-                  animate={{ width: `${result.percentages[i]}%` }}
-                  transition={{ duration: 0.6, ease: "easeOut" }}
-                  className={`absolute inset-y-0 left-0 ${
-                    isWinner ? "bg-yellow-400/25" : "bg-white/[0.06]"
+              <span className="flex items-center justify-between gap-3">
+                <span className="text-[13px] font-medium truncate">{option}</span>
+                <span
+                  className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 ${
+                    selected
+                      ? "bg-yellow-400 border-yellow-400 text-black"
+                      : "border-white/20 text-transparent"
                   }`}
                   aria-hidden
-                />
-              )}
-              <span className="relative flex items-center justify-between gap-3">
-                <span className="text-[13px] font-medium truncate">
-                  {voted && isWinner && <span className="text-yellow-300 mr-1">★</span>}
-                  {o}
+                >
+                  <Check className="w-3.5 h-3.5" strokeWidth={3} />
                 </span>
-                {voted && (
-                  <span className="text-[12px] text-slate-400 shrink-0 tabular-nums">
-                    {result.percentages[i]}%
-                  </span>
-                )}
               </span>
             </button>
           );
         })}
       </div>
-      <p className="text-[11px] text-slate-600 mt-2.5">
-        {voted
-          ? `${result.total} stemmen · jij koos "${options[choice!]}"`
-          : "Stem anoniem — de uitslag zie je direct."}
+      <p className="text-[11px] text-slate-500 mt-3 flex items-start gap-1.5 leading-relaxed">
+        <ShieldCheck className="w-3.5 h-3.5 text-yellow-400/70 shrink-0 mt-px" aria-hidden />
+        {choice === null
+          ? "Kies anoniem. We tonen pas publiekspercentages zodra er een echte centrale telling is."
+          : `Bedankt — jouw keuze “${options[choice]}” is op dit apparaat bewaard. Geen verzonnen stemmen.`}
       </p>
     </div>
   );
