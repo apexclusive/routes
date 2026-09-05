@@ -22,6 +22,7 @@ import SkipLink from "./SkipLink";
 import Logo from "./Logo";
 import SiteMenu from "./SiteMenu";
 import LangSwitch, { LangNotice } from "./LangSwitch";
+import ThemeSwitch from "./ThemeSwitch";
 import {
   CATEGORY_LABELS,
   FORUM_RULES,
@@ -206,7 +207,7 @@ export default function Forum() {
   const totalPosts = threads.reduce((n, t) => n + t.posts.length, 0);
 
   return (
-    <div className="min-h-dvh bg-[#050507] text-slate-100">
+    <div className="min-h-dvh bg-[var(--base)] text-slate-100">
       <ScrollProgress />
       <SkipLink />
       {/* nav */}
@@ -243,6 +244,7 @@ export default function Forum() {
           >
             Checklist
           </Link>
+          <ThemeSwitch />
           <LangSwitch className="hidden sm:flex" />
           <Link
             href="/"

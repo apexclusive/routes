@@ -26,7 +26,7 @@ export function TypingIndicator() {
       animate={{ opacity: 1, y: 0 }}
       className="msg-pop"
     >
-      <div className="flex items-center gap-2 px-4 py-3 bg-[#0e0e11] border border-white/10 rounded rounded-bl-sm w-fit">
+      <div className="flex items-center gap-2 px-4 py-3 bg-[var(--surface-solid)] border border-white/10 rounded rounded-bl-sm w-fit">
         <span className="typing">
           <i />
           <i />
@@ -58,7 +58,7 @@ export default function ChatMessage({
           className={
             isUser
               ? "px-4 py-3 rounded rounded-br-sm text-[15px] leading-relaxed font-semibold bg-gradient-to-br from-[#ffe600] to-[#ffb300] text-black border border-yellow-300/40"
-              : "px-4 py-3 rounded rounded-bl-sm text-[15px] leading-relaxed bg-[#0e0e11] border border-white/10 text-slate-100"
+              : "px-4 py-3 rounded rounded-bl-sm text-[15px] leading-relaxed bg-[var(--surface-solid)] border border-white/10 text-slate-100"
           }
           dangerouslySetInnerHTML={{ __html: renderContent(message.content) }}
         />

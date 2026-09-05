@@ -41,6 +41,7 @@ import ProDialog from "./ProDialog";
 import Poll from "./Poll";
 import RotwBand from "./RotwBand";
 import LangSwitch from "./LangSwitch";
+import ThemeSwitch from "./ThemeSwitch";
 import { LANDING, type Lang } from "@/lib/i18n";
 import { ROUTE_FILE_EXTENSIONS, isRouteFileName } from "@/lib/routing";
 import { PRO_PLANS } from "@/lib/pro";
@@ -310,7 +311,7 @@ export default function Landing({
   };
 
   return (
-    <div className="min-h-dvh text-white relative grain overflow-x-clip" {...dropHandlers}>
+    <div className="min-h-dvh text-slate-100 relative grain overflow-x-clip" {...dropHandlers}>
       {/* aurora + grid achtergrond */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
         <div className="aurora w-[42rem] h-[42rem] bg-[#ffe600]/[0.13] top-[-180px] right-[-140px]" />
@@ -379,6 +380,7 @@ export default function Landing({
             <BookOpen className="w-4 h-4 text-yellow-400/80" />
             <span className="hidden lg:inline">{t.nav.advisor}</span>
           </a>
+          <ThemeSwitch />
           <LangSwitch className="hidden sm:flex" />
           <button
             onClick={() => fileRef.current?.click()}
@@ -432,7 +434,7 @@ export default function Landing({
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
               onClick={(e) => e.stopPropagation()}
-              className="absolute right-0 top-0 bottom-0 w-[19rem] bg-[#0a0a0c]/95 border-l border-white/10 p-5 flex flex-col gap-1 overflow-y-auto"
+              className="absolute right-0 top-0 bottom-0 w-[19rem] bg-[var(--surface-raised)] border-l border-white/10 p-5 flex flex-col gap-1 overflow-y-auto"
               role="dialog"
               aria-modal="true"
               aria-label="Menu"

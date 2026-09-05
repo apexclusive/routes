@@ -23,6 +23,7 @@ import {
 import Logo from "./Logo";
 import SiteMenu from "./SiteMenu";
 import LangSwitch, { LangNotice } from "./LangSwitch";
+import ThemeSwitch from "./ThemeSwitch";
 import ScrollProgress from "./ScrollProgress";
 import SkipLink from "./SkipLink";
 import {
@@ -116,7 +117,7 @@ export default function Checklist() {
   };
 
   return (
-    <div className="min-h-dvh bg-[#050507] text-slate-100">
+    <div className="min-h-dvh bg-[var(--base)] text-slate-100">
       <ScrollProgress />
       <SkipLink />
 
@@ -139,6 +140,7 @@ export default function Checklist() {
           <Link href="/forum" className="btn-ghost h-10 px-3.5 rounded font-medium text-[13px] hidden sm:flex">
             Forum
           </Link>
+          <ThemeSwitch />
           <LangSwitch className="hidden sm:flex" />
           <Link href="/" className="btn-ghost h-10 px-3.5 rounded font-medium text-[13px] flex items-center gap-2">
             <ArrowLeft className="w-4 h-4" />

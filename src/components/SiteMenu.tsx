@@ -117,7 +117,7 @@ export default function SiteMenu() {
               exit={{ x: 24, opacity: 0 }}
               transition={{ duration: 0.22 }}
               aria-label="Sitenavigatie"
-              className="absolute top-0 right-0 h-dvh w-[min(22rem,calc(100vw-2rem))] bg-[#0a0a0d]/95 border-l border-white/10 overflow-y-auto px-5 py-5"
+              className="absolute top-0 right-0 h-dvh w-[min(22rem,calc(100vw-2rem))] bg-[var(--surface-raised)] border-l border-white/10 overflow-y-auto px-5 py-5"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between mb-5">

@@ -339,6 +339,18 @@ Research bij de topsites (Kurviger, Calimoto, REVER, Komoot, RideWithGPS) en de 
 - **FAQ +2 vragen per klim** ("Hoe zwaar is de ... vergeleken met andere klimmen?" en "Hoe lang doe je over de ...?") — volledig data-gedreven, dus 43 × 2 nieuwe antwoorden in de FAQPage-schema zonder handmatig onderhoud.
 - 304/304 tests (10 nieuwe: FIETS-ijking, kwadratische steilheidsweging, kasseitoeslag, klassegrenzen, ranglijst-integriteit, klimtijden, tophoogtes en coördinaten-bounding-box), lint 0, build groen. sitemap +1, sw v46.
 
+## Ronde 33: thema-schakelaar met drie paletten (v6.34)
+- **Universele schakelaar** (maan/zon/edelsteen/monitor) in de navigatiebalk van **alle 18 pagina's** — ook op `/adverteren`, dat bij de vorige nav-audit als enige geen navigatie bleek te hebben. Bewust *niet* achter `hidden sm:flex`: het thema is juist op een telefoon relevant. Eén klik wisselt door, het pijltje opent de lijst met omschrijvingen.
+- **Drie thema's** in plaats van twee, zodat de merkidentiteit niet achter een schakelaar verdwijnt: **Startgrid** (het bestaande zwart/geel, standaard), **Smaragd** (`#0d1612` / `#16241d`, tekst `#f3f4f6`, accent `#10b981` — exact de gevraagde luxe palette) en **Licht**.
+- **Systeem- en geheugenintegratie**: keuze in `localStorage` (`apex-routes:theme`), standaard "Systeem" dat live meeloopt met `prefers-color-scheme` — ook als je het tijdens het browsen omzet. Een tweede tabblad wisselt mee via het `storage`-event.
+- **Geen witte flits**: een blokkerend inline-script in de `<head>` zet `data-theme` vóór de eerste paint. Een test draait dat script in een nagebootste browser en vergelijkt de uitkomst met `resolveTheme()` voor alle 8 combinaties, zodat de twee implementaties niet uit elkaar kunnen lopen.
+- **Techniek**: geen enkele `dark:`-variant nodig. Tailwind v4 zet alle kleuren om naar `var(--color-*)`, dus de app wordt volledig herthematiseerd door die tokens per `[data-theme]` te herdefiniëren — inclusief het omkeren van de slate-schaal in de lichte modus, waar `white/5`-overlays juist subtiel donker moeten worden. Alle ~50 hardgecodeerde merkkleuren in `globals.css` en de componenten zijn vervangen door tokens; alleen de canvas-deelkaarten en OG-afbeeldingen blijven bewust merkzwart.
+- **Kaarttegels per thema**: het invert-filter op de Esri-stratenkaart gaat uit in de lichte modus en wordt groener in Smaragd.
+- **Bug gevonden en gerepareerd**: het merkpalet klapt bewust *alle* accentkleuren (emerald, orange, rose) naar geel. Daardoor waren de zwaarteklassen uit ronde 32 in de praktijk allemaal even geel. Ze hebben nu een eigen expliciete schaal (`.zwaarte-*`) die per thema kantelt.
+- **Toegankelijkheid getest, niet aangenomen**: `themecontrast.test.ts` leest de echte kleuren uit `globals.css` en rekent het WCAG-contrast uit. Die test vond meteen een echt probleem — wit op de goudknop van het lichte thema haalde maar 3,82:1; het accent is daarop verdonkerd naar `#8a6600`. Alle thema's halen nu AA.
+- **Plaatsingstest**: `themeplacement.test.ts` scant de broncode en faalt als een pagina met een navigatiebalk de schakelaar mist of hem achter een breakpoint verstopt — geverifieerd door hem tijdelijk te slopen.
+- 322/322 tests (+9 thema, +6 contrast, +3 plaatsing), lint 0, build groen. sw v47; manifest-snelkoppeling naar de klimranglijst.
+
 ## Productie-integraties
 
 De kernplanner werkt zonder commerciële sleutels. Voor een productie-uitrol staan alle

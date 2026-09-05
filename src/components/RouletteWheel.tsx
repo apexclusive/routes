@@ -210,7 +210,7 @@ export default function RouletteWheel({
             <DialFace activeKey={result?.corridor.key} />
             <Needle rotation={rotation} />
             {/* naaf */}
-            <div className="absolute inset-0 m-auto w-[74px] h-[74px] rounded-full bg-[#0b0b0d] border border-yellow-400/50 flex flex-col items-center justify-center z-20 shadow-[0_6px_18px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.12)]">
+            <div className="absolute inset-0 m-auto w-[74px] h-[74px] rounded-full bg-[var(--surface-solid)] border border-yellow-400/50 flex flex-col items-center justify-center z-20 shadow-[0_6px_18px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.12)]">
               <Gauge className="w-5 h-5 text-yellow-400" aria-hidden />
               <span className="text-[9px] uppercase tracking-[0.18em] text-yellow-400/90 font-bold mt-1 font-mono">
                 Apex

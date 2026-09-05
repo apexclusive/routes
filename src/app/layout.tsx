@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Analytics from "@/components/Analytics";
+import { themeBootScript } from "@/lib/theme";
 import BillingReturn from "@/components/BillingReturn";
 import "./globals.css";
 
@@ -70,8 +71,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="nl">
+    <html lang="nl" suppressHydrationWarning>
       <head>
+        {/* Zet het thema vóór de eerste paint: geen witte flits bij donker. */}
+        <script dangerouslySetInnerHTML={{ __html: themeBootScript() }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"

@@ -27,6 +27,7 @@ import SiteMenu from "./SiteMenu";
 import TiltCard from "./TiltCard";
 import Poll from "./Poll";
 import LangSwitch, { LangNotice } from "./LangSwitch";
+import ThemeSwitch from "./ThemeSwitch";
 import { plannerUrl, setPendingPrompt } from "@/lib/filehandoff";
 import {
   DESTINATIONS,
@@ -65,7 +66,7 @@ export default function Advisor() {
   };
 
   return (
-    <div className="min-h-dvh text-white grain relative overflow-x-clip bg-[#050507]">
+    <div className="min-h-dvh text-slate-100 grain relative overflow-x-clip bg-[var(--base)]">
       <ScrollProgress />
       <SkipLink />
       <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
@@ -117,6 +118,7 @@ export default function Advisor() {
           >
             Checklist
           </Link>
+          <ThemeSwitch />
           <LangSwitch className="hidden sm:flex" />
           <Link
             href="/"
@@ -199,8 +201,8 @@ export default function Advisor() {
                       sizes="(max-width: 768px) 100vw, 40vw"
                       className="object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[#050507]/70 md:to-[#050507]" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#050507]/80 to-transparent md:hidden" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[var(--base)]/70 md:to-[var(--base)]" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[var(--base)]/80 to-transparent md:hidden" />
                   </div>
                   <div className="relative p-6 flex flex-col flex-1">
                     <p className="text-[11px] uppercase tracking-[0.18em] text-yellow-400/90 font-bold mb-1.5">
@@ -341,7 +343,7 @@ export default function Advisor() {
                 sizes="(max-width: 768px) 100vw, 33vw"
                 className="object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#050507] to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[var(--base)] to-transparent" />
             </div>
             <div className="lux-card p-5">
               <ul className="space-y-2">
@@ -383,7 +385,7 @@ export default function Advisor() {
               sizes="(max-width: 768px) 100vw, 33vw"
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#050507]/85 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[var(--base)]/85 via-transparent to-transparent" />
             <div className="absolute bottom-4 left-4 right-4">
               <p className="text-[13px] text-slate-300 leading-snug">
                 <b className="text-yellow-300">DOT-code.</b> Vier cijfers op de
@@ -496,7 +498,7 @@ export default function Advisor() {
               sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#050507]/90 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[var(--base)]/90 via-transparent to-transparent" />
           </div>
           <div className="lux-card p-6">
             <h3 className="font-display font-bold text-[16px] mb-3">Hotelkeuze die morgen beter maakt</h3>
@@ -551,7 +553,7 @@ export default function Advisor() {
             sizes="100vw"
             className="object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#050507]/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[var(--base)]/80 to-transparent" />
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -619,7 +621,7 @@ export default function Advisor() {
             sizes="100vw"
             className="object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#050507]/85 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[var(--base)]/85 to-transparent" />
           <p className="absolute bottom-4 left-5 right-5 text-[13px] text-slate-300 leading-snug">
             <b className="text-yellow-300">De trap van Landgraaf.</b> 508 treden,
             248 meter lang, top ±225 m NAP — de langste trap van Nederland, en
@@ -696,7 +698,7 @@ export default function Advisor() {
               sizes="(max-width: 768px) 100vw, 33vw"
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#050507]/70 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[var(--base)]/70 to-transparent" />
           </div>
           <div className="grid sm:grid-cols-2 gap-3">
             {AIR_EXPERIENCES.map((a) => (

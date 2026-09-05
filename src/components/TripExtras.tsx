@@ -100,7 +100,7 @@ export default function TripExtras({
           <select
             value={adults}
             onChange={(event) => setAdults(Number(event.target.value))}
-            className="w-full h-10 bg-[#111114] border border-white/10 rounded px-2.5 text-[12px] text-slate-200 outline-none focus:border-yellow-400/60"
+            className="w-full h-10 bg-[var(--surface-solid)] border border-white/10 rounded px-2.5 text-[12px] text-slate-200 outline-none focus:border-yellow-400/60"
           >
             {[1, 2, 3, 4, 5, 6].map((count) => (
               <option key={count} value={count}>{count}</option>

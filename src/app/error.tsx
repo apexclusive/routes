@@ -14,7 +14,7 @@ export default function GlobalError({
   reset: () => void;
 }) {
   return (
-    <div className="h-dvh w-full bg-[#050507] text-white flex items-center justify-center p-6">
+    <div className="h-dvh w-full bg-[var(--base)] text-slate-100 flex items-center justify-center p-6">
       <div className="glass rounded p-8 max-w-md text-center">
         <Route className="w-10 h-10 mx-auto mb-4 text-yellow-400" aria-hidden />
         <h1 className="font-display font-bold text-xl mb-2">

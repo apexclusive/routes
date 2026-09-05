@@ -31,6 +31,7 @@ import SiteMenu from "./SiteMenu";
 import TiltCard from "./TiltCard";
 import Poll from "./Poll";
 import LangSwitch, { LangNotice } from "./LangSwitch";
+import ThemeSwitch from "./ThemeSwitch";
 import { EVENTS, eventsForYear, EVENT_CATS, MONTHS_NL, NEWS, type EventCat,
   type EventCountry,
 } from "@/lib/calendar";
@@ -101,7 +102,7 @@ export default function Kalender() {
   );
 
   return (
-    <div className="min-h-dvh text-white grain relative overflow-x-clip bg-[#050507]">
+    <div className="min-h-dvh text-slate-100 grain relative overflow-x-clip bg-[var(--base)]">
       <ScrollProgress />
       <SkipLink />
       <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
@@ -131,6 +132,7 @@ export default function Kalender() {
           <Link href="/checklist" className="btn-ghost h-10 px-3.5 rounded font-medium text-[13px] hidden lg:flex">
             Checklist
           </Link>
+          <ThemeSwitch />
           <LangSwitch className="hidden sm:flex" />
           <Link href="/" className="btn-ghost h-10 px-3.5 rounded font-medium text-[13px] flex items-center gap-2">
             <ArrowLeft className="w-4 h-4" />
@@ -151,7 +153,7 @@ export default function Kalender() {
             sizes="100vw"
             className="object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#050507] via-[#050507]/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[var(--base)] via-[var(--base)]/40 to-transparent" />
           <div className="absolute bottom-6 left-6 right-6">
             <span className="inline-flex items-center gap-2 px-3.5 py-1.5 glass rounded text-[12px] text-slate-300 mb-4 border border-white/10">
               <CalendarDays className="w-3.5 h-3.5 text-yellow-400" />

@@ -22,6 +22,7 @@ import Logo from "./Logo";
 import SiteMenu from "./SiteMenu";
 import TiltCard from "./TiltCard";
 import LangSwitch, { LangNotice } from "./LangSwitch";
+import ThemeSwitch from "./ThemeSwitch";
 import Bucketlist from "./Bucketlist";
 import {
   COUNTRIES,
@@ -52,7 +53,7 @@ export default function Discover() {
   const openInPlanner = useOpenInPlanner();
 
   return (
-    <div className="min-h-dvh text-white grain relative overflow-x-clip bg-[#050507]">
+    <div className="min-h-dvh text-slate-100 grain relative overflow-x-clip bg-[var(--base)]">
       <ScrollProgress />
       <SkipLink />
       {/* achtergrond */}
@@ -93,6 +94,7 @@ export default function Discover() {
           >
             Forum
           </Link>
+          <ThemeSwitch />
           <LangSwitch className="hidden sm:flex" />
           <Link
             href="/"
@@ -166,7 +168,7 @@ export default function Discover() {
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 className="object-cover opacity-55"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#050507] via-[#050507]/75 to-[#050507]/10" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[var(--base)] via-[var(--base)]/75 to-[var(--base)]/10" />
               <div className="relative flex flex-col flex-1 p-5">
               <div className="flex items-start justify-between gap-2 mb-1">
                 <span className="text-[11px] font-bold text-yellow-400/90 font-mono">
@@ -261,7 +263,7 @@ export default function Discover() {
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 className="object-cover opacity-45"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#050507] via-[#050507]/78 to-[#050507]/15" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[var(--base)] via-[var(--base)]/78 to-[var(--base)]/15" />
               <div className="relative flex flex-col flex-1 p-5">
               <div className="flex items-center justify-between mb-2">
                 <span className="w-10 h-10 rounded glass border border-yellow-400/20 flex items-center justify-center" aria-hidden>

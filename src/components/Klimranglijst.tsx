@@ -7,6 +7,7 @@ import { Mountain, Trophy, Road, Route as RouteIcon } from "lucide-react";
 import Logo from "./Logo";
 import SiteMenu from "./SiteMenu";
 import LangSwitch from "./LangSwitch";
+import ThemeSwitch from "./ThemeSwitch";
 import ScrollProgress from "./ScrollProgress";
 import SkipLink from "./SkipLink";
 import { CLIMBS, type EventCountry } from "@/lib/climbs";
@@ -25,11 +26,11 @@ const LANDEN: { id: EventCountry | "alle"; label: string }[] = [
 ];
 
 const KLASSE_KLEUR: Record<ZwaarteKlasse, string> = {
-  instap: "bg-emerald-400/10 border-emerald-400/30 text-emerald-300",
-  pittig: "bg-lime-400/10 border-lime-400/30 text-lime-300",
-  zwaar: "bg-yellow-400/10 border-yellow-400/30 text-yellow-300",
-  loodzwaar: "bg-orange-400/10 border-orange-400/30 text-orange-300",
-  buitencategorie: "bg-red-400/10 border-red-400/30 text-red-300",
+  instap: "zwaarte zwaarte-instap",
+  pittig: "zwaarte zwaarte-pittig",
+  zwaar: "zwaarte zwaarte-zwaar",
+  loodzwaar: "zwaarte zwaarte-loodzwaar",
+  buitencategorie: "zwaarte zwaarte-buitencategorie",
 };
 
 export default function Klimranglijst() {
@@ -45,7 +46,7 @@ export default function Klimranglijst() {
   };
 
   return (
-    <div className="min-h-dvh text-slate-100 grain relative overflow-x-clip bg-[#050507]">
+    <div className="min-h-dvh text-slate-100 grain relative overflow-x-clip bg-[var(--base)]">
       <ScrollProgress />
       <SkipLink />
       <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
@@ -63,6 +64,7 @@ export default function Klimranglijst() {
           <Link href="/klimmen" className="btn-ghost h-10 px-3.5 rounded font-medium text-[13px] hidden sm:flex">
             Klimbibliotheek
           </Link>
+          <ThemeSwitch />
           <LangSwitch className="hidden sm:flex" />
           <Link href="/" className="btn-brand h-10 px-4 rounded font-semibold text-[13px] hidden sm:block">
             Naar de planner
@@ -156,7 +158,7 @@ export default function Klimranglijst() {
                         {c.place} · {c.country} · top {c.summitM} m
                       </span>
                       <span
-                        className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide border ${KLASSE_KLEUR[klasse]}`}
+                        className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide ${KLASSE_KLEUR[klasse]}`}
                       >
                         {klasse}
                       </span>

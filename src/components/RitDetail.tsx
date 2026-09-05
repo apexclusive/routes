@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Route as RouteIcon, BedDouble, Mountain, ArrowLeft } from "lucide-react";
 import Logo from "./Logo";
 import LangSwitch from "./LangSwitch";
+import ThemeSwitch from "./ThemeSwitch";
 import ScrollProgress from "./ScrollProgress";
 import SkipLink from "./SkipLink";
 import SiteMenu from "./SiteMenu";
@@ -41,7 +42,7 @@ export default function RitDetail({ rit }: { rit: Rit }) {
   };
 
   return (
-    <div className="min-h-dvh text-slate-100 grain relative overflow-x-clip bg-[#050507]">
+    <div className="min-h-dvh text-slate-100 grain relative overflow-x-clip bg-[var(--base)]">
       <ScrollProgress />
       <SkipLink />
       <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
@@ -62,6 +63,7 @@ export default function RitDetail({ rit }: { rit: Rit }) {
             Klimmen
           </Link>
           <SiteMenu />
+          <ThemeSwitch />
           <LangSwitch className="hidden sm:flex" />
         </div>
       </nav>

@@ -7,6 +7,7 @@ import { Route as RouteIcon, BedDouble, Mountain } from "lucide-react";
 import Logo from "./Logo";
 import SiteMenu from "./SiteMenu";
 import LangSwitch from "./LangSwitch";
+import ThemeSwitch from "./ThemeSwitch";
 import ScrollProgress from "./ScrollProgress";
 import SkipLink from "./SkipLink";
 import { RITTEN, type EventCountry } from "@/lib/ritten";
@@ -49,7 +50,7 @@ export default function Ritten() {
   };
 
   return (
-    <div className="min-h-dvh text-slate-100 grain relative overflow-x-clip bg-[#050507]">
+    <div className="min-h-dvh text-slate-100 grain relative overflow-x-clip bg-[var(--base)]">
       <ScrollProgress />
       <SkipLink />
       <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
@@ -70,6 +71,7 @@ export default function Ritten() {
           <Link href="/kalender" className="btn-ghost h-10 px-3.5 rounded font-medium text-[13px] hidden sm:flex">
             Kalender
           </Link>
+          <ThemeSwitch />
           <LangSwitch className="hidden sm:flex" />
           <Link href="/" className="btn-brand h-10 px-4 rounded font-semibold text-[13px] hidden sm:block">
             Naar de planner

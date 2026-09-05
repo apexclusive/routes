@@ -24,6 +24,7 @@ import SkipLink from "./SkipLink";
 import Logo from "./Logo";
 import SiteMenu from "./SiteMenu";
 import LangSwitch, { LangNotice } from "./LangSwitch";
+import ThemeSwitch from "./ThemeSwitch";
 import { listSavedRoutes, type StoredRoute } from "@/lib/storage";
 import { encodeRoute, decodeRoute, buildShareUrl } from "@/lib/share";
 import { formatDistance } from "@/lib/routing";
@@ -274,7 +275,7 @@ export default function Ritbank() {
   };
 
   return (
-    <div className="min-h-dvh text-white grain relative overflow-x-clip bg-[#050507]">
+    <div className="min-h-dvh text-slate-100 grain relative overflow-x-clip bg-[var(--base)]">
       <ScrollProgress />
       <SkipLink />
       <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
@@ -292,6 +293,7 @@ export default function Ritbank() {
         </Link>
         <div className="flex items-center gap-2">
           <SiteMenu />
+          <ThemeSwitch />
           <LangSwitch className="hidden sm:flex" />
           <Link
             href="/"

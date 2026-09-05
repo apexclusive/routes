@@ -12,6 +12,9 @@
 - POI-laag: beschikbare OpenStreetMap-resultaten voor tankstations, laadpalen en uitzichtpunten tot 2 km van de route, plus een aanklikbare stops-lijst
 - Weer bij vertrek (Open-Meteo), hoogteprofiel, rit-helpers (omkeren, lus sluiten, volgorde optimaliseren)
 
+## Weergave
+- Drie thema's via de schakelaar in de navigatiebalk van elke pagina: Startgrid (zwart met geel accent, standaard), Smaragd (diep smaragdgroen met emerald-accent) en Licht. De keuze "Systeem" volgt de donkere modus van het besturingssysteem; de voorkeur wordt lokaal onthouden in localStorage (apex-routes:theme). Alle drie de thema's halen WCAG AA-contrast, bewaakt door een test.
+
 ## Belangrijke pagina's
 - / : landingspagina + direct naar de planner
 - /ontdek : top-10-routes per land (NL·BE·LU·DE), circuits, bucketlist
