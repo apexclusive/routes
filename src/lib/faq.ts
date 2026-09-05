@@ -1,5 +1,6 @@
 import type { Climb } from "./climbs.ts";
 import type { Rit } from "./ritten.ts";
+import { tourKm, tourRijmin, type Tour } from "./tours.ts";
 import { climbScore, klimtijdMinuten, zwaarteKlasse } from "./climbscore.ts";
 
 export type FaqItem = { q: string; a: string };
@@ -88,6 +89,39 @@ export function buildRitFaq(r: Rit): FaqItem[] {
     {
       q: `Waar start ik de ${r.naam} en waar slaap ik?`,
       a: `De startplaats is ${r.plaats}. Via de knop "Verblijf in ${r.plaats}" op deze pagina zie je direct hotels en B&B's voor een weekend of midweek.`,
+    },
+  ];
+}
+
+/** FAQ voor een meerdaagse tour; volledig afgeleid uit de data. */
+export function buildTourFaq(t: Tour): FaqItem[] {
+  const min = tourRijmin(t);
+  const uur = `${Math.floor(min / 60)} uur${min % 60 ? ` en ${min % 60} minuten` : ""}`;
+  const gemiddeld = Math.round(tourKm(t) / t.dagen.length);
+  return [
+    {
+      q: `Hoeveel nachten heb ik nodig voor de ${t.naam}?`,
+      a: `Reken op ${t.nachten} nachten in ${t.basiskamp}. Je slaapt elke nacht in hetzelfde hotel en rijdt overdag ${t.dagen.length} verschillende lussen, gemiddeld ${gemiddeld} km per dag.`,
+    },
+    {
+      q: `Waarom één basiskamp in plaats van elke dag verder rijden?`,
+      a: `${t.waaromHier} Je pakt maar één keer uit, betaalt vaak minder voor meerdere nachten en verliest geen ochtenden aan in- en uitchecken.`,
+    },
+    {
+      q: `Wat kost deze tour vergeleken met een georganiseerde reis?`,
+      a: `Een begeleide reis in dit gebied begint rond de €${t.georganiseerdVanafEur.toLocaleString("nl-NL")} per persoon. Zelf rijden kost je alleen hotel, brandstof en de vermelde tol of vignetten.`,
+    },
+    {
+      q: `Wanneer kan ik de ${t.naam} rijden?`,
+      a: `${t.seizoen.charAt(0).toUpperCase()}${t.seizoen.slice(1)} Controleer voor vertrek altijd of de passen open zijn; sneeuw en werkzaamheden kunnen een weg ook in het seizoen sluiten.`,
+    },
+    {
+      q: `Hoeveel uur zit ik in totaal op de weg?`,
+      a: `De ${t.dagen.length} dagritten samen zijn ${tourKm(t)} km en ongeveer ${uur} rijden, exclusief stops voor koffie, foto's en brandstof.`,
+    },
+    {
+      q: `Is de ${t.naam} geschikt voor mijn voertuig?`,
+      a: `Deze tour is uitgewerkt voor ${t.voertuigen.join(", ")}. De route volgt gewone openbare wegen, dus ook een auto komt overal — alleen de dagafstanden voelen per voertuig anders.`,
     },
   ];
 }

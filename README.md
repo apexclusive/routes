@@ -351,6 +351,40 @@ Research bij de topsites (Kurviger, Calimoto, REVER, Komoot, RideWithGPS) en de 
 - **Plaatsingstest**: `themeplacement.test.ts` scant de broncode en faalt als een pagina met een navigatiebalk de schakelaar mist of hem achter een breakpoint verstopt — geverifieerd door hem tijdelijk te slopen.
 - 322/322 tests (+9 thema, +6 contrast, +3 plaatsing), lint 0, build groen. sw v47; manifest-snelkoppeling naar de klimranglijst.
 
+## Ronde 34: meerdaagse tours vanuit één basiskamp (v6.35)
+
+Een begeleide alpenreis kost €1.499 tot €4.650 per persoon. Precies datzelfde
+rijplezier is zelf te regelen — als je weet welk dorp midden tussen de passen
+ligt. Dat is het basiskamp-model: je boekt 2 tot 4 nachten in één hotel en
+rijdt elke dag een andere lus terug naar hetzelfde bed. Goedkoper voor de
+bezoeker, geen koffers sjouwen, en commercieel gezien de waardevolste boeking
+die de site kan opleveren (meerdere nachten in plaats van één).
+
+- **`src/lib/tours.ts`** — 6 tours met dagritten, koppelingen naar de
+  klimbibliotheek, seizoen, tol/vignetkosten en `georganiseerdVanafEur` als
+  eerlijk prijsanker: Arabba (Dolomieten/Sella Ronda, 4 nachten), Bormio
+  (Stelvio + Gavia + Mortirolo, 4), Zell am See (Grossglockner, 3), Andermatt
+  (Zwitserse passen, 3), Valkenburg (Zuid-Limburg, 2) en La Roche (Ardennen, 2).
+  Helpers: `tourKm`, `tourRijmin`, `tourKlimmen`, `tourHoogtemeters`,
+  `tourZwaarte` (som van de FIETS-index) en `toursOpZwaarte`.
+- **`/tours` en `/tours/<id>`** — filterbaar overzicht op land en voertuig plus
+  een detailpagina met dag-voor-dag itinerary, klim-chips met zwaartescore, een
+  plan-knop per dag naar de route-assistent, de kostenposten en een FAQ.
+- **`TripExtras` kent nu nachten** — op een tourpagina staan de datumvelden
+  meteen op het juiste aantal nachten in het basiskamp, met een eigen kop.
+- **Structured data** — `TouristTrip` met de dagritten als `itinerary`,
+  `ItemList` op het overzicht, breadcrumbs en `FAQPage` via `buildTourFaq`.
+- **Themabug uit Ronde 33 verholpen** — de aurora-glows, SVG-attributen
+  (`stroke`/`fill`/`stopColor`) en Tailwind-gradientstops stonden nog op de
+  merkgele hex en verkleurden dus niet mee in Smaragd en Licht. Nu allemaal
+  getokeniseerd. Leaflet tekent buiten de CSS-cascade om, dus `PremiumMap`
+  leest de themakleur voortaan uit met `getComputedStyle`.
+- **`/geo`-helpers** (`src/lib/geo.ts`) — haversine, wegafstand, dichtstbij,
+  middelpunt, bounding box en clustering; de tourtest gebruikt ze om te
+  bewijzen dat elke klim binnen 120 km van het basiskamp ligt. Anders is het
+  namelijk geen basiskamp.
+- **340 tests groen**, lint schoon, `sw.js` naar v48, sitemap en `llms.txt` bij.
+
 ## Productie-integraties
 
 De kernplanner werkt zonder commerciële sleutels. Voor een productie-uitrol staan alle

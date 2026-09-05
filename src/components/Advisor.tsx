@@ -70,7 +70,7 @@ export default function Advisor() {
       <ScrollProgress />
       <SkipLink />
       <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-        <div className="aurora w-[42rem] h-[42rem] bg-[#ffe600]/[0.11] top-[-180px] left-[-140px]" />
+        <div className="aurora w-[42rem] h-[42rem] bg-[var(--accent)]/[0.11] top-[-180px] left-[-140px]" />
         <div
           className="aurora w-[34rem] h-[34rem] bg-white/[0.05] bottom-[-160px] right-[-120px]"
           style={{ animationDelay: "-11s" }}

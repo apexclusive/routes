@@ -211,7 +211,7 @@ export default function Checklist() {
           </div>
           <div className="h-2 bg-white/[0.06] rounded-sm overflow-hidden">
             <motion.div
-              className="h-full bg-gradient-to-r from-[#ffe600] to-[#ffb300]"
+              className="h-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent-warm)]"
               animate={{ width: `${pct}%` }}
               transition={{ type: "spring", damping: 26, stiffness: 240 }}
             />

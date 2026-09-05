@@ -1,10 +1,11 @@
 import type { MetadataRoute } from "next";
 import { CLIMBS } from "@/lib/climbs";
 import { RITTEN } from "@/lib/ritten";
+import { TOURS } from "@/lib/tours";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = "https://routes.apexclusive.nl";
-  const lastModified = new Date("2026-09-04T00:00:00.000Z");
+  const lastModified = new Date("2026-09-05T00:00:00.000Z");
   const routes: { path: string; priority: number; freq: "daily" | "weekly" | "monthly" | "yearly" }[] = [
     { path: "/", priority: 1, freq: "weekly" },
     { path: "/ontdek", priority: 0.9, freq: "weekly" },
@@ -18,6 +19,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...RITTEN.map((r) => ({
       path: `/ritten/${r.id}`,
       priority: 0.7,
+      freq: "monthly" as const,
+    })),
+    { path: "/tours", priority: 0.9, freq: "monthly" },
+    ...TOURS.map((t) => ({
+      path: `/tours/${t.id}`,
+      priority: 0.8,
       freq: "monthly" as const,
     })),
     { path: "/klimmen", priority: 0.8, freq: "monthly" },

@@ -58,7 +58,7 @@ export default function Discover() {
       <SkipLink />
       {/* achtergrond */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-        <div className="aurora w-[42rem] h-[42rem] bg-[#ffe600]/[0.12] top-[-180px] left-[-140px]" />
+        <div className="aurora w-[42rem] h-[42rem] bg-[var(--accent)]/[0.12] top-[-180px] left-[-140px]" />
         <div
           className="aurora w-[36rem] h-[36rem] bg-white/[0.06] bottom-[-160px] right-[-120px]"
           style={{ animationDelay: "-9s" }}

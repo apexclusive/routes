@@ -57,7 +57,7 @@ export default function ChatMessage({
         <div
           className={
             isUser
-              ? "px-4 py-3 rounded rounded-br-sm text-[15px] leading-relaxed font-semibold bg-gradient-to-br from-[#ffe600] to-[#ffb300] text-black border border-yellow-300/40"
+              ? "px-4 py-3 rounded rounded-br-sm text-[15px] leading-relaxed font-semibold bg-gradient-to-br from-[var(--accent)] to-[var(--accent-warm)] text-black border border-yellow-300/40"
               : "px-4 py-3 rounded rounded-bl-sm text-[15px] leading-relaxed bg-[var(--surface-solid)] border border-white/10 text-slate-100"
           }
           dangerouslySetInnerHTML={{ __html: renderContent(message.content) }}

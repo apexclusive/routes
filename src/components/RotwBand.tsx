@@ -61,7 +61,7 @@ export default function RotwBand() {
         transition={{ duration: 0.5 }}
         className="lux-card corner-frame p-8 sm:p-10 relative overflow-hidden"
       >
-        <div className="aurora w-72 h-72 bg-[#ffe600]/[0.07] -top-24 -left-20" aria-hidden />
+        <div className="aurora w-72 h-72 bg-[var(--accent)]/[0.07] -top-24 -left-20" aria-hidden />
         <div className="flex flex-col lg:flex-row lg:items-center gap-6 relative">
           <span className="w-14 h-14 rounded bg-yellow-400/10 border border-yellow-400/25 flex items-center justify-center shrink-0">
             <RouteIcon className="w-7 h-7 text-yellow-300" aria-hidden />

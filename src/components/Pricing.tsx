@@ -52,7 +52,7 @@ export default function Pricing() {
       <ScrollProgress />
       <SkipLink />
       <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-        <div className="aurora w-[46rem] h-[46rem] bg-[#ffe600]/[0.12] top-[-220px] right-[-160px]" />
+        <div className="aurora w-[46rem] h-[46rem] bg-[var(--accent)]/[0.12] top-[-220px] right-[-160px]" />
         <div className="absolute inset-0 grid-bg" />
       </div>
 

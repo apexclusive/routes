@@ -51,6 +51,17 @@ function escapeHtml(s: string): string {
     .replace(/"/g, "&quot;");
 }
 
+
+/**
+ * Leaflet tekent op canvas/SVG buiten de CSS-cascade om, dus daar moeten we
+ * de themakleur zelf uitlezen in plaats van een var() mee te geven.
+ */
+function themaKleur(naam: string, fallback: string): string {
+  if (typeof window === "undefined") return fallback;
+  const v = getComputedStyle(document.documentElement).getPropertyValue(naam).trim();
+  return v || fallback;
+}
+
 export default function PremiumMap({
   waypoints,
   routeGeometry,
@@ -89,7 +100,8 @@ export default function PremiumMap({
   });
 
   const createCustomIcon = (index: number, isEndpoint: boolean) => {
-    const color = isEndpoint ? (index === 0 ? "#ffe600" : "#ffffff") : "#ffe600";
+    const accent = themaKleur("--accent", "#ffe600");
+    const color = isEndpoint ? (index === 0 ? accent : themaKleur("--text-strong", "#ffffff")) : accent;
     const size = isEndpoint ? 16 : 13;
 
     return L.divIcon({
@@ -208,7 +220,7 @@ export default function PremiumMap({
       }).addTo(map);
 
       routeLayerRef.current = L.polyline(latLngs, {
-        color: "#ffe600",
+        color: themaKleur("--accent", "#ffe600"),
         weight: 5,
         opacity: 0.98,
         lineCap: "round",

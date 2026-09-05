@@ -151,11 +151,11 @@ function FeatureVisual({ kind }: { kind: string }) {
           strokeLinecap="round"
           className="route-draw"
         />
-        <circle cx="6" cy="44" r="3.5" fill="#ffe600" />
-        <circle cx="214" cy="30" r="3.5" fill="#ffe600" />
+        <circle cx="6" cy="44" r="3.5" fill="var(--accent)" />
+        <circle cx="214" cy="30" r="3.5" fill="var(--accent)" />
         <g transform="translate(120 12)">
           <circle r="9" fill="rgba(255,230,0,0.15)" className="poi-dot" />
-          <path d="M-3.5 1 L0 -3 L3.5 1 M0 -3 L0 4" stroke="#ffe600" strokeWidth="1.8" fill="none" strokeLinecap="round" />
+          <path d="M-3.5 1 L0 -3 L3.5 1 M0 -3 L0 4" stroke="var(--accent)" strokeWidth="1.8" fill="none" strokeLinecap="round" />
         </g>
       </svg>
     );
@@ -176,7 +176,7 @@ function FeatureVisual({ kind }: { kind: string }) {
         ].map((p) => (
           <g key={`${p.x}-${p.y}`} transform={`translate(${p.x} ${p.y})`}>
             <circle r="10" fill="rgba(255,230,0,0.14)" className="poi-dot" style={{ animationDelay: `${p.d}s` }} />
-            <circle r="3" fill="#ffe600" />
+            <circle r="3" fill="var(--accent)" />
           </g>
         ))}
       </svg>
@@ -314,7 +314,7 @@ export default function Landing({
     <div className="min-h-dvh text-slate-100 relative grain overflow-x-clip" {...dropHandlers}>
       {/* aurora + grid achtergrond */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-        <div className="aurora w-[42rem] h-[42rem] bg-[#ffe600]/[0.13] top-[-180px] right-[-140px]" />
+        <div className="aurora w-[42rem] h-[42rem] bg-[var(--accent)]/[0.13] top-[-180px] right-[-140px]" />
         <div
           className="aurora w-[36rem] h-[36rem] bg-white/[0.07] bottom-[-160px] left-[-120px]"
           style={{ animationDelay: "-9s" }}
@@ -846,7 +846,7 @@ export default function Landing({
           transition={{ duration: 0.5 }}
           className="lux-card corner-frame p-8 sm:p-10 relative overflow-hidden"
         >
-          <div className="aurora w-72 h-72 bg-[#ffe600]/[0.07] -top-24 -right-20" aria-hidden />
+          <div className="aurora w-72 h-72 bg-[var(--accent)]/[0.07] -top-24 -right-20" aria-hidden />
           <div className="flex flex-col sm:flex-row sm:items-center gap-6 relative">
             <span className="w-14 h-14 rounded bg-yellow-400/10 border border-yellow-400/25 flex items-center justify-center shrink-0">
               <MessagesSquare className="w-7 h-7 text-yellow-300" />
@@ -1013,7 +1013,7 @@ export default function Landing({
           viewport={{ once: true }}
           className="relative overflow-hidden lux-card p-10 sm:p-14 text-center"
         >
-          <div className="aurora w-[26rem] h-[26rem] bg-[#ffe600]/10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+          <div className="aurora w-[26rem] h-[26rem] bg-[var(--accent)]/10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
           <h2 className="relative text-3xl sm:text-4xl font-bold mb-4 font-display tracking-tight">
             {t.finalTitle}
           </h2>
@@ -1035,7 +1035,7 @@ export default function Landing({
       {/* footer */}
       <footer className="relative z-10 border-t border-white/[0.07] overflow-hidden">
         <div className="topo-lines absolute inset-0 pointer-events-none" aria-hidden />
-        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[36rem] h-[24rem] aurora bg-[#ffe600]/[0.05] pointer-events-none" aria-hidden />
+        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[36rem] h-[24rem] aurora bg-[var(--accent)]/[0.05] pointer-events-none" aria-hidden />
         <div className="relative max-w-6xl mx-auto px-6 pt-14 pb-8">
           <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
             {/* merk */}

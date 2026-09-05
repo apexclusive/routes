@@ -84,8 +84,8 @@ function DialFace({ activeKey }: { activeKey?: string }) {
               cx={150 + 126 * Math.cos(((i * SECTOR_DEG - 90 + SECTOR_DEG / 2) * Math.PI) / 180)}
               cy={150 + 126 * Math.sin(((i * SECTOR_DEG - 90 + SECTOR_DEG / 2) * Math.PI) / 180)}
               r={2.6}
-              fill={active ? "#ffe600" : "rgba(255,255,255,0.18)"}
-              style={active ? { filter: "drop-shadow(0 0 5px #ffe600)" } : undefined}
+              fill={active ? "var(--accent)" : "rgb(var(--overlay-rgb) / 0.18)"}
+              style={active ? { filter: "drop-shadow(0 0 5px var(--accent))" } : undefined}
             />
             <text
               x={x}
@@ -96,7 +96,7 @@ function DialFace({ activeKey }: { activeKey?: string }) {
               fontSize="8"
               fontWeight="700"
               letterSpacing="0.08em"
-              fill={active ? "#ffe600" : "rgba(255,255,255,0.55)"}
+              fill={active ? "var(--accent)" : "rgb(var(--overlay-rgb) / 0.55)"}
               style={{ fontFamily: "ui-monospace, Menlo, monospace", textTransform: "uppercase" }}
             >
               {c.label}
@@ -129,7 +129,7 @@ function Needle({ rotation }: { rotation: number }) {
       style={{ filter: "drop-shadow(0 3px 6px rgba(0,0,0,0.7))" }}
     >
       <svg viewBox="0 0 300 300" className="w-full h-full" aria-hidden>
-        <polygon points="150,34 153.5,150 146.5,150" fill="#ffe600" />
+        <polygon points="150,34 153.5,150 146.5,150" fill="var(--accent)" />
         <polygon points="150,34 153.5,150 150,150" fill="#fff7c2" opacity="0.6" />
         <rect x="146" y="150" width="8" height="34" rx="3" fill="#2a2a2e" stroke="rgba(255,255,255,0.15)" strokeWidth="0.5" />
       </svg>
@@ -317,7 +317,7 @@ export default function RouletteWheel({
               transition={{ type: "spring", damping: 22, stiffness: 300 }}
               className="glass rounded border border-yellow-400/30 p-5 mt-5 relative overflow-hidden"
             >
-              <div className="aurora w-56 h-56 bg-[#ffe600]/10 -top-20 -right-16" />
+              <div className="aurora w-56 h-56 bg-[var(--accent)]/10 -top-20 -right-16" />
               <div className="flex items-center gap-4">
                 <span className="w-11 h-11 rounded bg-yellow-400/10 border border-yellow-400/25 flex items-center justify-center shrink-0" aria-hidden>
                   <MapPinIcon label={result.corridor.label} />

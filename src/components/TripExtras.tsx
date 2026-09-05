@@ -25,13 +25,25 @@ import {
 export default function TripExtras({
   place,
   context,
+  nachten = 1,
+  titel,
 }: {
   place: string;
-  context: "rit" | "klim" | "planner";
+  context: "rit" | "klim" | "planner" | "tour";
+  /** aantal nachten dat standaard wordt voorgesteld (meerdaagse tour) */
+  nachten?: number;
+  /** eigen kop, bijvoorbeeld voor een basiskamp */
+  titel?: string;
 }) {
   const defaults = useMemo(() => defaultTravelDates(), []);
+  const vertrekDefault = useMemo(() => {
+    if (nachten <= 1) return defaults.checkout;
+    const eind = new Date(`${defaults.checkin}T12:00:00`);
+    eind.setDate(eind.getDate() + nachten);
+    return localIsoDate(eind);
+  }, [defaults, nachten]);
   const [checkin, setCheckin] = useState(defaults.checkin);
-  const [checkout, setCheckout] = useState(defaults.checkout);
+  const [checkout, setCheckout] = useState(vertrekDefault);
   const [adults, setAdults] = useState(2);
   const datesValid = Boolean(checkin && checkout && checkout > checkin);
   const hotelUrl = bookingSearchUrl(place, {
@@ -49,13 +61,16 @@ export default function TripExtras({
           <MapPin className="w-5 h-5 text-yellow-300" aria-hidden />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="eyebrow mb-1">MAAK DE RIT COMPLEET</p>
+          <p className="eyebrow mb-1">
+            {nachten > 1 ? "BOEK JE BASISKAMP" : "MAAK DE RIT COMPLEET"}
+          </p>
           <h2 className="font-display font-bold text-xl">
-            Slapen en beleven bij {place}
+            {titel ?? `Slapen en beleven bij ${place}`}
           </h2>
           <p className="text-[13px] text-slate-400 mt-1 leading-relaxed">
-            Zoek een verblijf voor je gekozen weekend of bekijk activiteiten
-            voor een stop naast de route.
+            {nachten > 1
+              ? `De datums staan alvast op ${nachten} nachten in ${place}, zodat je elke dag vanaf hetzelfde bed vertrekt.`
+              : "Zoek een verblijf voor je gekozen weekend of bekijk activiteiten voor een stop naast de route."}
           </p>
         </div>
       </div>
@@ -74,7 +89,7 @@ export default function TripExtras({
               setCheckin(next);
               if (checkout <= next) {
                 const end = new Date(`${next}T12:00:00`);
-                end.setDate(end.getDate() + 1);
+                end.setDate(end.getDate() + Math.max(1, nachten));
                 setCheckout(localIsoDate(end));
               }
             }}

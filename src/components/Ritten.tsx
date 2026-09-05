@@ -54,7 +54,7 @@ export default function Ritten() {
       <ScrollProgress />
       <SkipLink />
       <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-        <div className="aurora w-[42rem] h-[42rem] bg-[#ffe600]/[0.10] top-[-180px] left-[-140px]" />
+        <div className="aurora w-[42rem] h-[42rem] bg-[var(--accent)]/[0.10] top-[-180px] left-[-140px]" />
         <div className="absolute inset-0 grid-bg" />
       </div>
 

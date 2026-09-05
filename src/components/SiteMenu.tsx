@@ -20,12 +20,14 @@ import {
   Megaphone,
   Crown,
   Trophy,
+  BedDouble,
 } from "lucide-react";
 import { SITE_LINKS, SITE_GROEPEN } from "@/lib/nav";
 
 const ICONEN = {
   planner: MapIcon,
   ritten: Route,
+  tours: BedDouble,
   klimmen: Mountain,
   ranglijst: Trophy,
   kalender: CalendarDays,
