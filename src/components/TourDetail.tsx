@@ -18,6 +18,7 @@ import ScrollProgress from "./ScrollProgress";
 import SkipLink from "./SkipLink";
 import ShareButton from "./ShareButton";
 import TripExtras from "./TripExtras";
+import TourKosten from "./TourKosten";
 import { CLIMBS } from "@/lib/climbs";
 import { climbScore } from "@/lib/climbscore";
 import { plannerUrl, setPendingPrompt } from "@/lib/filehandoff";
@@ -185,6 +186,9 @@ export default function TourDetail({ tour }: { tour: Tour }) {
             ))}
           </ol>
         </section>
+
+        {/* eerst het geldargument, dan pas de boekknop */}
+        <TourKosten tour={tour} />
 
         {/* de boeking: meerdere nachten, dus de waardevolste conversie */}
         <TripExtras

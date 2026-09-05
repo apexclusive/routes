@@ -20,6 +20,7 @@ import {
   type Voertuig,
 } from "@/lib/tours";
 import { bookingSearchUrl } from "@/lib/monetize";
+import { euro, standaardRaming } from "@/lib/tourkosten";
 
 const LANDEN: { id: EventCountry | "alle"; label: string }[] = [
   { id: "alle", label: "Alles" },
@@ -185,6 +186,15 @@ export default function Tours() {
               <p className="text-[11px] text-slate-500 mb-3 flex items-start gap-1.5">
                 <CalendarDays className="w-3 h-3 mt-0.5 shrink-0" aria-hidden />
                 {t.seizoen}
+              </p>
+
+              <p className="text-[12px] mb-3 pb-3 border-b border-white/[0.07] text-slate-400">
+                Zelf rijden:{" "}
+                <strong className="text-slate-200 font-mono">
+                  ± {euro(standaardRaming(t).perPersoonEur)} p.p.
+                </strong>{" "}
+                <span className="text-slate-600">·</span> georganiseerd vanaf{" "}
+                <span className="font-mono">{euro(t.georganiseerdVanafEur)}</span>
               </p>
 
               <div className="flex flex-wrap items-center gap-2 mt-auto">

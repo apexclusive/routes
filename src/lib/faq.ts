@@ -1,6 +1,7 @@
 import type { Climb } from "./climbs.ts";
 import type { Rit } from "./ritten.ts";
 import { tourKm, tourRijmin, type Tour } from "./tours.ts";
+import { standaardRaming } from "./tourkosten.ts";
 import { climbScore, klimtijdMinuten, zwaarteKlasse } from "./climbscore.ts";
 
 export type FaqItem = { q: string; a: string };
@@ -109,7 +110,7 @@ export function buildTourFaq(t: Tour): FaqItem[] {
     },
     {
       q: `Wat kost deze tour vergeleken met een georganiseerde reis?`,
-      a: `Een begeleide reis in dit gebied begint rond de €${t.georganiseerdVanafEur.toLocaleString("nl-NL")} per persoon. Zelf rijden kost je alleen hotel, brandstof en de vermelde tol of vignetten.`,
+      a: `Een begeleide reis in dit gebied begint rond de €${t.georganiseerdVanafEur.toLocaleString("nl-NL")} per persoon. Zelf rijden met z'n tweeën op de motor komt op ongeveer €${standaardRaming(t).perPersoonEur.toLocaleString("nl-NL")} per persoon: hotel, brandstof en de vermelde tol of vignetten samen. Dat scheelt zo'n €${standaardRaming(t).besparingPerPersoonEur.toLocaleString("nl-NL")} per persoon.`,
     },
     {
       q: `Wanneer kan ik de ${t.naam} rijden?`,

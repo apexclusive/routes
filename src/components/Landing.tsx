@@ -33,9 +33,11 @@ import {
   Mountain,
   Megaphone,
   Route,
+  BedDouble,
 } from "lucide-react";
 import Logo from "./Logo";
 import SkipLink from "./SkipLink";
+import TourStrip from "./TourStrip";
 import RouletteWheel from "./RouletteWheel";
 import ProDialog from "./ProDialog";
 import Poll from "./Poll";
@@ -459,6 +461,7 @@ export default function Landing({
                   { href: "/checklist", icon: ClipboardCheck, label: t.footer.checklist },
                   { href: "/gpx", icon: FileDown, label: t.footer.gpx },
                   { href: "/ritten", icon: Route, label: t.footer.ritten },
+                  { href: "/tours", icon: BedDouble, label: "Meerdaagse tours" },
                   { href: "/klimmen", icon: Mountain, label: t.footer.klimmen },
                   { href: "/prijzen", icon: Crown, label: "Apex Pro & prijzen" },
                   { href: "/adverteren", icon: Megaphone, label: t.footer.adverteren },
@@ -793,6 +796,9 @@ export default function Landing({
         </motion.div>
       </section>
 
+      {/* meerdaagse tours: basiskamp-model */}
+      <TourStrip lang={langState} />
+
       {/* tellers */}
       <section className="relative z-10 py-10 border-y border-white/[0.07]">
         <div className="max-w-5xl mx-auto px-6 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
@@ -891,7 +897,7 @@ export default function Landing({
           viewport={{ once: true }}
           className="text-3xl sm:text-5xl font-bold text-center mb-4 tracking-tight font-display"
         >
-          <span className="sec-index block text-center mb-3">03 /</span>
+          <span className="sec-index block text-center mb-3">04 /</span>
           {t.pricing.titleA} <span className="text-gradient">{t.pricing.titleB}</span>
         </motion.h2>
         <p className="text-center text-slate-500 mb-12 max-w-xl mx-auto">{t.pricing.sub}</p>
@@ -1077,6 +1083,11 @@ export default function Landing({
                 <li>
                   <Link href="/#roulette" className="text-slate-400 hover:text-yellow-400 transition-colors">
                     {t.footer.roulette}
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/tours" className="text-slate-400 hover:text-yellow-400 transition-colors">
+                    Meerdaagse tours
                   </Link>
                 </li>
                 <li>

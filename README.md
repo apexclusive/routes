@@ -385,6 +385,32 @@ die de site kan opleveren (meerdere nachten in plaats van één).
   namelijk geen basiskamp.
 - **340 tests groen**, lint schoon, `sw.js` naar v48, sitemap en `llms.txt` bij.
 
+## Ronde 35: de kostenrekenmodule en de tours vindbaar maken (v6.36)
+
+Ronde 34 leverde de tours op, maar liet twee gaten open: ze waren alleen via
+het hamburger-menu te vinden, en "een begeleide reis kost €4.650" bleef een
+abstract getal. Allebei gedicht.
+
+- **`src/lib/tourkosten.ts`** — raamt wat een tour jou echt kost: hotel
+  (2 personen per kamer, naar boven afgerond), brandstof (5,5 l/100 km voor
+  een motor, 8,0 voor een auto, tegen de landprijs) en tol/vignetten. Eén
+  motor per persoon, één auto voor de hele groep — zo werkt het in het echt.
+  Brandstofprijzen komen uit het Weekly Oil Bulletin van de Europese Commissie
+  via fuel-prices.eu en independer.nl; hotelprijzen uit Booking.com-gemiddelden.
+  Bron en peildatum staan in `BRON`, zodat we ze elke ronde kunnen herijken.
+- **`TourKosten.tsx`** — een rekenmodule op elke tourpagina: kies voertuig,
+  aantal personen en je eigen hotelprijs, en zie direct de besparing. Zell am
+  See komt op ± €306 p.p. tegen €2.200 georganiseerd. Dat getal staat nu ook
+  in de FAQ, de meta-description en op de OG-kaart — precies waar het in een
+  zoekresultaat of tijdlijn het werk doet.
+- **`TourStrip.tsx`** — sectie 03 op de landing met de drie zwaarste tours,
+  viertalig. Plus `/tours` in het mobiele menu, de footer en het site-menu.
+- **OG-afbeeldingen voor tours** — 1200×630 met de vier kerncijfers en de
+  concrete besparing als call-to-action in plaats van een loze kreet.
+- **351 tests groen**, waaronder een guard die klapt zodra een nieuw basiskamp
+  geen hotelraming heeft, en één die controleert dat zelf rijden nooit duurder
+  uitvalt dan de georganiseerde reis waarmee we het vergelijken. `sw.js` v49.
+
 ## Productie-integraties
 
 De kernplanner werkt zonder commerciële sleutels. Voor een productie-uitrol staan alle

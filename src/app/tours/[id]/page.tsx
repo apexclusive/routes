@@ -4,6 +4,7 @@ import TourDetail from "@/components/TourDetail";
 import { TOURS, tourKm, type Tour } from "@/lib/tours";
 import { breadcrumbSchema, SITE_BASE } from "@/lib/schema";
 import { buildTourFaq, faqPageSchema } from "@/lib/faq";
+import { standaardRaming } from "@/lib/tourkosten";
 
 /** data is statisch: onbekende ids geven een echte 404 */
 export const dynamicParams = false;
@@ -21,13 +22,32 @@ export async function generateMetadata({
   const t = TOURS.find((x) => x.id === id);
   if (!t) return {};
   const title = `${t.naam} — ${t.nachten} nachten, ${t.dagen.length} dagritten · Apex Routes`;
-  const description = `${t.naam}: ${t.dagen.length} dagritten (${tourKm(t)} km) vanuit één basiskamp in ${t.basiskamp}. Dagafstanden, passen, seizoen, tol en vignetten — zelf te rijden voor een fractie van de €${t.georganiseerdVanafEur.toLocaleString("nl-NL")} van een begeleide reis.`;
+  const r = standaardRaming(t);
+  const description = `${t.naam}: ${t.dagen.length} dagritten (${tourKm(t)} km) vanuit één basiskamp in ${t.basiskamp}. Zelf rijden kost ± €${r.perPersoonEur.toLocaleString("nl-NL")} p.p. tegen €${t.georganiseerdVanafEur.toLocaleString("nl-NL")} voor een begeleide reis. Met dagafstanden, passen, seizoen, tol en vignetten.`;
   return {
     title,
     description,
     alternates: { canonical: `/tours/${t.id}` },
-    openGraph: { title, description, url: `/tours/${t.id}`, type: "article" },
-    twitter: { card: "summary_large_image", title, description },
+    openGraph: {
+      title,
+      description,
+      url: `/tours/${t.id}`,
+      type: "article",
+      images: [
+        {
+          url: `/tours/${t.id}/opengraph-image`,
+          width: 1200,
+          height: 630,
+          alt: `${t.naam} — ${t.nachten} nachten vanuit ${t.basiskamp}`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [`/tours/${t.id}/opengraph-image`],
+    },
   };
 }
 
