@@ -4,6 +4,7 @@ import { Megaphone, Mountain, CalendarDays, MousePointerClick, ShieldCheck } fro
 import { breadcrumbSchema } from "@/lib/schema";
 import PartnerForm from "@/components/PartnerForm";
 import SiteMenu from "@/components/SiteMenu";
+import ThemeSwitch from "@/components/ThemeSwitch";
 import Logo from "@/components/Logo";
 
 export const metadata = pageMetadata({
@@ -44,18 +45,19 @@ const PACKAGES = [
 
 export default function AdverterenPage() {
   return (
-    <div className="min-h-dvh text-slate-100 grain relative overflow-x-clip bg-[#050507]">
+    <div className="min-h-dvh text-slate-100 grain relative overflow-x-clip bg-[var(--base)]">
       <nav className="sticky top-0 z-40 px-4 sm:px-5 py-3 flex items-center justify-between max-w-7xl mx-auto glass site-nav w-[calc(100%-1.25rem)] border border-white/10">
         <Link href="/" className="flex items-center gap-2.5">
           <Logo size={30} />
           <span className="text-lg font-bold tracking-tight font-display">Partners</span>
         </Link>
         <div className="flex items-center gap-2">
+          <ThemeSwitch />
           <SiteMenu />
         </div>
       </nav>
       <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-        <div className="aurora w-[42rem] h-[42rem] bg-[#ffe600]/[0.10] top-[-180px] right-[-140px]" />
+        <div className="aurora w-[42rem] h-[42rem] bg-[var(--accent)]/[0.10] top-[-180px] right-[-140px]" />
         <div className="absolute inset-0 grid-bg" />
       </div>
 

@@ -115,7 +115,7 @@ export default function LandingMap({ className = "" }: { className?: string }) {
 
     // geanimeerde gele route (marcherende streepjes = beweging)
     L.polyline(latLngs, {
-      color: "#ffe600",
+      color: "var(--accent)",
       weight: 4.5,
       opacity: 0.98,
       lineCap: "round",

@@ -329,6 +329,117 @@ Research bij de topsites (Kurviger, Calimoto, REVER, Komoot, RideWithGPS) en de 
 - **Seizoensdata** voor alle 28 klimmen en 10 ritten (indicatief): wintergesloten Alpenpassen (Galibier, Tourmalet, Stelvio, Grossglockner, Timmelsjoch...), kasseien-waarschuwingen, Moezel-wijnoogst-drukte. Zichtbaar als chip (klim) en tile "Beste periode" (rit) — data die bezoekers nergens anders in één oogopslag vinden.
 - **Veelgestelde vragen + FAQPage-schema** op alle 38 detailpagina's: volledig data-gedrive­n gegenereerd (lib/faq.ts: steilheid, lengte/hm, oppervlakte, tol, opening, overnachten) — geen handmatig onderhoud, 4 nieuwe tests (253) bewaken vorm en volledigheid. Vouwbare <details>-sectie in merkhuisstijl; JSON-LD maakt ze kandidaat voor rich snippets in Google.
 - **Deelkaart-knop** op rit- en klimdetail: genereert client-side een 1080×1080 PNG in merkhuisstijl (raster, gele gloed, stats-blokjes, "PLAN DEZE RIT"-badge) — downloadbaar voor Instagram/WhatsApp-status: mond-tot-mond met het merk erop. sw v42.
+## Ronde 32: klimdata verdubbeld + objectieve zwaartescore (v6.33)
+- **43 beklimmingen (was 28)**: 15 nieuwe cols op geverifieerde cijfers — **Mont Ventoux** (21,5 km/7,5%/1600 hm vanaf Bédoin), **Cime de la Bonette** (hoogste asfaltweg van Europa, 2802 m), **Col de l'Iseran** (hoogste bergpas van de Alpen), **Cormet de Roselend**, de Dolomieten (**Passo Giau** 9,8 km @ 9,5%, **Pordoi**, **Sella** — cijfers uit de organisatiedata van de Maratona dles Dolomites), **Passo Gavia**, de Zwitserse pasklassiekers (**Grimsel**, **Susten**, **Klausen**, **Nufenen**) en drie Benelux-muren die ontbraken: **Mur de Huy** (finish Waalse Pijl), **Kemmelberg** en de **Keutenberg** met zijn 22%-bordje. Bronnen: climbfinder en organisatiedata.
+- **Twee nieuwe datavelden op elke klim**: tophoogte boven zeeniveau (`summitM`) en coördinaten van de top (`lat`/`lon`) — nodig voor de zwaartescore en bruikbaar voor toekomstige kaartweergave.
+- **FIETS-index als zwaartemaat** (`lib/climbscore.ts`): de internationaal gebruikte formule van tijdschrift Fiets — `H²/(D×10) + (T−1000)/1000` — plus een eerlijk gemarkeerde Apex-toeslag voor kasseien en keien. Geijkt aan de gepubliceerde referentiewaarden (Mont Ventoux ≈ 12,8, Alpe d'Huez ≈ 10, Cauberg 0,4); een test bewaakt die ijking zodat de formule niet stilletjes kan wegdrijven. Vijf zwaarteklassen van *instap* tot *buitencategorie*, plus indicatieve klimtijden per niveau uit de VAM (600/950/1500 hm per uur).
+- **Nieuwe pagina /klimmen/ranglijst**: alle 43 klimmen objectief gerangschikt, met een balk per rij die de score visualiseert, land-filter met tellingen, zwaarteklasse-badges, klimtijd en een plan-knop per regel. **ItemList-JSON-LD** over de top 25 — ranglijsten zijn bij Google kandidaat voor rich results, en "zwaarste beklimmingen" is precies de zoekvraag die deze doelgroep stelt.
+- **Klimbibliotheek uitgebreid**: score + ranglijstpositie + zwaarteklasse op elke kaart, een zwaarte-filter en vier sorteeropties (zwaarte, steilste stuk, langste, alfabetisch) in plaats van de vaste sortering op maximumpercentage.
+- **Klim-detailpagina**: het blok "Zwaarte in context" toont nu de echte index met klasse-badge, positie in de ranglijst (klikbaar) en drie klimtijden, in plaats van een kale procentbalk t.o.v. de hoogste col.
+- **FAQ +2 vragen per klim** ("Hoe zwaar is de ... vergeleken met andere klimmen?" en "Hoe lang doe je over de ...?") — volledig data-gedreven, dus 43 × 2 nieuwe antwoorden in de FAQPage-schema zonder handmatig onderhoud.
+- 304/304 tests (10 nieuwe: FIETS-ijking, kwadratische steilheidsweging, kasseitoeslag, klassegrenzen, ranglijst-integriteit, klimtijden, tophoogtes en coördinaten-bounding-box), lint 0, build groen. sitemap +1, sw v46.
+
+## Ronde 33: thema-schakelaar met drie paletten (v6.34)
+- **Universele schakelaar** (maan/zon/edelsteen/monitor) in de navigatiebalk van **alle 18 pagina's** — ook op `/adverteren`, dat bij de vorige nav-audit als enige geen navigatie bleek te hebben. Bewust *niet* achter `hidden sm:flex`: het thema is juist op een telefoon relevant. Eén klik wisselt door, het pijltje opent de lijst met omschrijvingen.
+- **Drie thema's** in plaats van twee, zodat de merkidentiteit niet achter een schakelaar verdwijnt: **Startgrid** (het bestaande zwart/geel, standaard), **Smaragd** (`#0d1612` / `#16241d`, tekst `#f3f4f6`, accent `#10b981` — exact de gevraagde luxe palette) en **Licht**.
+- **Systeem- en geheugenintegratie**: keuze in `localStorage` (`apex-routes:theme`), standaard "Systeem" dat live meeloopt met `prefers-color-scheme` — ook als je het tijdens het browsen omzet. Een tweede tabblad wisselt mee via het `storage`-event.
+- **Geen witte flits**: een blokkerend inline-script in de `<head>` zet `data-theme` vóór de eerste paint. Een test draait dat script in een nagebootste browser en vergelijkt de uitkomst met `resolveTheme()` voor alle 8 combinaties, zodat de twee implementaties niet uit elkaar kunnen lopen.
+- **Techniek**: geen enkele `dark:`-variant nodig. Tailwind v4 zet alle kleuren om naar `var(--color-*)`, dus de app wordt volledig herthematiseerd door die tokens per `[data-theme]` te herdefiniëren — inclusief het omkeren van de slate-schaal in de lichte modus, waar `white/5`-overlays juist subtiel donker moeten worden. Alle ~50 hardgecodeerde merkkleuren in `globals.css` en de componenten zijn vervangen door tokens; alleen de canvas-deelkaarten en OG-afbeeldingen blijven bewust merkzwart.
+- **Kaarttegels per thema**: het invert-filter op de Esri-stratenkaart gaat uit in de lichte modus en wordt groener in Smaragd.
+- **Bug gevonden en gerepareerd**: het merkpalet klapt bewust *alle* accentkleuren (emerald, orange, rose) naar geel. Daardoor waren de zwaarteklassen uit ronde 32 in de praktijk allemaal even geel. Ze hebben nu een eigen expliciete schaal (`.zwaarte-*`) die per thema kantelt.
+- **Toegankelijkheid getest, niet aangenomen**: `themecontrast.test.ts` leest de echte kleuren uit `globals.css` en rekent het WCAG-contrast uit. Die test vond meteen een echt probleem — wit op de goudknop van het lichte thema haalde maar 3,82:1; het accent is daarop verdonkerd naar `#8a6600`. Alle thema's halen nu AA.
+- **Plaatsingstest**: `themeplacement.test.ts` scant de broncode en faalt als een pagina met een navigatiebalk de schakelaar mist of hem achter een breakpoint verstopt — geverifieerd door hem tijdelijk te slopen.
+- 322/322 tests (+9 thema, +6 contrast, +3 plaatsing), lint 0, build groen. sw v47; manifest-snelkoppeling naar de klimranglijst.
+
+## Ronde 34: meerdaagse tours vanuit één basiskamp (v6.35)
+
+Een begeleide alpenreis kost €1.499 tot €4.650 per persoon. Precies datzelfde
+rijplezier is zelf te regelen — als je weet welk dorp midden tussen de passen
+ligt. Dat is het basiskamp-model: je boekt 2 tot 4 nachten in één hotel en
+rijdt elke dag een andere lus terug naar hetzelfde bed. Goedkoper voor de
+bezoeker, geen koffers sjouwen, en commercieel gezien de waardevolste boeking
+die de site kan opleveren (meerdere nachten in plaats van één).
+
+- **`src/lib/tours.ts`** — 6 tours met dagritten, koppelingen naar de
+  klimbibliotheek, seizoen, tol/vignetkosten en `georganiseerdVanafEur` als
+  eerlijk prijsanker: Arabba (Dolomieten/Sella Ronda, 4 nachten), Bormio
+  (Stelvio + Gavia + Mortirolo, 4), Zell am See (Grossglockner, 3), Andermatt
+  (Zwitserse passen, 3), Valkenburg (Zuid-Limburg, 2) en La Roche (Ardennen, 2).
+  Helpers: `tourKm`, `tourRijmin`, `tourKlimmen`, `tourHoogtemeters`,
+  `tourZwaarte` (som van de FIETS-index) en `toursOpZwaarte`.
+- **`/tours` en `/tours/<id>`** — filterbaar overzicht op land en voertuig plus
+  een detailpagina met dag-voor-dag itinerary, klim-chips met zwaartescore, een
+  plan-knop per dag naar de route-assistent, de kostenposten en een FAQ.
+- **`TripExtras` kent nu nachten** — op een tourpagina staan de datumvelden
+  meteen op het juiste aantal nachten in het basiskamp, met een eigen kop.
+- **Structured data** — `TouristTrip` met de dagritten als `itinerary`,
+  `ItemList` op het overzicht, breadcrumbs en `FAQPage` via `buildTourFaq`.
+- **Themabug uit Ronde 33 verholpen** — de aurora-glows, SVG-attributen
+  (`stroke`/`fill`/`stopColor`) en Tailwind-gradientstops stonden nog op de
+  merkgele hex en verkleurden dus niet mee in Smaragd en Licht. Nu allemaal
+  getokeniseerd. Leaflet tekent buiten de CSS-cascade om, dus `PremiumMap`
+  leest de themakleur voortaan uit met `getComputedStyle`.
+- **`/geo`-helpers** (`src/lib/geo.ts`) — haversine, wegafstand, dichtstbij,
+  middelpunt, bounding box en clustering; de tourtest gebruikt ze om te
+  bewijzen dat elke klim binnen 120 km van het basiskamp ligt. Anders is het
+  namelijk geen basiskamp.
+- **340 tests groen**, lint schoon, `sw.js` naar v48, sitemap en `llms.txt` bij.
+
+## Ronde 35: de kostenrekenmodule en de tours vindbaar maken (v6.36)
+
+Ronde 34 leverde de tours op, maar liet twee gaten open: ze waren alleen via
+het hamburger-menu te vinden, en "een begeleide reis kost €4.650" bleef een
+abstract getal. Allebei gedicht.
+
+- **`src/lib/tourkosten.ts`** — raamt wat een tour jou echt kost: hotel
+  (2 personen per kamer, naar boven afgerond), brandstof (5,5 l/100 km voor
+  een motor, 8,0 voor een auto, tegen de landprijs) en tol/vignetten. Eén
+  motor per persoon, één auto voor de hele groep — zo werkt het in het echt.
+  Brandstofprijzen komen uit het Weekly Oil Bulletin van de Europese Commissie
+  via fuel-prices.eu en independer.nl; hotelprijzen uit Booking.com-gemiddelden.
+  Bron en peildatum staan in `BRON`, zodat we ze elke ronde kunnen herijken.
+- **`TourKosten.tsx`** — een rekenmodule op elke tourpagina: kies voertuig,
+  aantal personen en je eigen hotelprijs, en zie direct de besparing. Zell am
+  See komt op ± €306 p.p. tegen €2.200 georganiseerd. Dat getal staat nu ook
+  in de FAQ, de meta-description en op de OG-kaart — precies waar het in een
+  zoekresultaat of tijdlijn het werk doet.
+- **`TourStrip.tsx`** — sectie 03 op de landing met de drie zwaarste tours,
+  viertalig. Plus `/tours` in het mobiele menu, de footer en het site-menu.
+- **OG-afbeeldingen voor tours** — 1200×630 met de vier kerncijfers en de
+  concrete besparing als call-to-action in plaats van een loze kreet.
+- **351 tests groen**, waaronder een guard die klapt zodra een nieuw basiskamp
+  geen hotelraming heeft, en één die controleert dat zelf rijden nooit duurder
+  uitvalt dan de georganiseerde reis waarmee we het vergelijken. `sw.js` v49.
+
+## Ronde 36: "is de Stelvio al open?" en prijzen die zichzelf bijhouden (v6.37)
+
+De meest gestelde vraag in dit hele onderwerp is niet welke route de mooiste
+is, maar of de weg er überhaupt doorheen gaat. Die vraag piekt elk voorjaar
+opnieuw en is puur seizoensgebonden zoekverkeer — precies waar een
+klimbibliotheek van 43 passen op kan aansluiten.
+
+- **`src/lib/passtatus.ts` + `/passen`** — seizoenskalender van 18 alpenpassen.
+  Kies een maand, zie welke passen dan normaal open liggen. Geijkt op de
+  werkelijke data van 2026: Grossglockner 25 april, Furka/Grimsel/Nufenen
+  29 mei, Stelvio 31 mei, Susten en Iséran pas 12 juni. Inclusief de autovrije
+  fietsdagen (Stelvio 29 augustus en 19 september 2026) en per pas een link
+  naar de wegbeheerder.
+- **Bewust géén live-status.** Wie op basis van een gemiddelde 800 km rijdt en
+  voor een slagboom staat, komt nooit meer terug. Daarom heet het overal
+  "meestal open", zijn de randmaanden expliciet als risico gemarkeerd, en staat
+  de officiële bron er altijd naast. Een test bewaakt dat er in januari geen
+  enkele pas op "open" kan staan.
+- **`scripts/ververs-prijzen.mjs`** (`npm run prijzen`) — haalt de
+  brandstofprijzen op uit het Weekly Oil Bulletin en laat eerst zien wat er zou
+  wijzigen; pas met `--schrijf` gaat het het bestand in. Het script weigert te
+  schrijven als de helft van de landen ontbreekt, want dan is de bronpagina
+  veranderd. Zwitserland zit niet in de EU-bron en houdt zichtbaar zijn
+  handmatige waarde in plaats van een verzonnen getal.
+- **Kruislinks** — vanaf elke tour "Zijn de passen al open?", en `/passen` in
+  het site-menu, mobiele menu, footer en de sitemap.
+- **363 tests groen**, waaronder een controle dat elke pas naar een bestaande
+  klim verwijst en dat de hoogtes overeenkomen met de klimbibliotheek. `sw.js` v50.
+
 ## Productie-integraties
 
 De kernplanner werkt zonder commerciële sleutels. Voor een productie-uitrol staan alle

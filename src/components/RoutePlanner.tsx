@@ -143,7 +143,7 @@ import GaragePanel from "./GaragePanel";
 const PremiumMap = dynamic(() => import("./map/PremiumMap"), {
   ssr: false,
   loading: () => (
-    <div className="absolute inset-0 bg-[#050507] flex items-center justify-center">
+    <div className="absolute inset-0 bg-[var(--base)] flex items-center justify-center">
       <div className="text-center">
         <div className="w-12 h-12 border-4 border-slate-700 border-t-yellow-400 rounded-full animate-spin mx-auto mb-4" />
         <p className="text-slate-400">Kaart laden...</p>
@@ -1570,7 +1570,7 @@ export default function RoutePlanner() {
 
   return (
     <div
-      className="apex-shell h-dvh w-full flex flex-col bg-[#050507] text-white overflow-hidden"
+      className="apex-shell h-dvh w-full flex flex-col bg-[var(--base)] text-white overflow-hidden"
       onDragEnter={handleDragEnter}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
@@ -1868,7 +1868,7 @@ export default function RoutePlanner() {
               }}
               exit={{ width: 0, opacity: 0 }}
               transition={{ duration: 0.25 }}
-              className="flex-shrink-0 bg-[#0e0e11] border-r border-white/10 flex flex-col overflow-hidden print:hidden
+              className="flex-shrink-0 bg-[var(--surface-solid)] border-r border-white/10 flex flex-col overflow-hidden print:hidden
                 absolute inset-y-0 left-0 z-30 shadow-2xl
                 sm:relative sm:z-20 sm:shadow-none"
             >
@@ -2613,7 +2613,7 @@ export default function RoutePlanner() {
 
           {/* Stops langs de route: leesbare data-lijst onder de actieknoppen */}
           {showPois && pois.length > 0 && (
-            <div className="bg-[#0e0e11] border border-white/10 rounded overflow-hidden">
+            <div className="bg-[var(--surface-solid)] border border-white/10 rounded overflow-hidden">
               <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/10">
                 <p className="text-[11px] font-bold uppercase tracking-widest text-yellow-400/90">
                   {P.stopsList}

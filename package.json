@@ -12,7 +12,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "node --experimental-strip-types --disable-warning=ExperimentalWarning --test src/lib/__tests__/*.test.ts",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "prijzen": "node scripts/ververs-prijzen.mjs"
   },
   "dependencies": {
     "@types/leaflet": "^1.9.22",

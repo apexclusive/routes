@@ -72,6 +72,11 @@
       "description": "Direct plannen"
     },
     {
+      "name": "Klimranglijst",
+      "url": "/klimmen/ranglijst",
+      "description": "Zwaarste beklimmingen"
+    },
+    {
       "name": "Vertrek-checklist",
       "url": "/checklist",
       "description": "Checklist vóór vertrek"

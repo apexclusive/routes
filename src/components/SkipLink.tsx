@@ -17,7 +17,7 @@ export default function SkipLink({ target = "#apex-main" }: { target?: string })
   return (
     <a
       href={target}
-      className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:px-4 focus:py-2.5 focus:rounded focus:bg-[#ffe600] focus:text-black focus:font-bold focus:text-sm"
+      className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:px-4 focus:py-2.5 focus:rounded focus:bg-[var(--accent)] focus:text-black focus:font-bold focus:text-sm"
     >
       {SHARED[lang].skip}
     </a>

@@ -58,15 +58,15 @@ export default function ElevationProfile({
       >
         <defs>
           <linearGradient id="apex-elev" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#ffe600" stopOpacity="0.45" />
-            <stop offset="100%" stopColor="#ffe600" stopOpacity="0.03" />
+            <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.45" />
+            <stop offset="100%" stopColor="var(--accent)" stopOpacity="0.03" />
           </linearGradient>
         </defs>
         <path d={area} fill="url(#apex-elev)" />
         <path
           d={line}
           fill="none"
-          stroke="#ffe600"
+          stroke="var(--accent)"
           strokeWidth={1.5}
           strokeLinejoin="round"
           strokeLinecap="round"

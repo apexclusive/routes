@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import Logo from "./Logo";
 import SiteMenu from "./SiteMenu";
+import ThemeSwitch from "./ThemeSwitch";
 import SkipLink from "./SkipLink";
 
 export default function LegalShell({
@@ -24,10 +25,10 @@ export default function LegalShell({
   const hasLegalIdentity = Object.values(legal).some(Boolean);
 
   return (
-    <div className="min-h-dvh text-slate-100 grain relative overflow-x-clip bg-[#050507]">
+    <div className="min-h-dvh text-slate-100 grain relative overflow-x-clip bg-[var(--base)]">
       <SkipLink />
       <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-        <div className="aurora w-[38rem] h-[38rem] bg-[#ffe600]/[0.08] top-[-180px] right-[-120px]" />
+        <div className="aurora w-[38rem] h-[38rem] bg-[var(--accent)]/[0.08] top-[-180px] right-[-120px]" />
         <div className="absolute inset-0 grid-bg" />
       </div>
       <nav className="sticky top-0 z-40 px-4 sm:px-5 py-3 flex items-center justify-between max-w-7xl mx-auto glass site-nav w-[calc(100%-1.25rem)] border border-white/10">
@@ -36,6 +37,7 @@ export default function LegalShell({
           <span className="text-lg font-bold tracking-tight font-display">Apex Routes</span>
         </Link>
         <div className="flex items-center gap-2">
+          <ThemeSwitch />
           <SiteMenu />
           <Link href="/prijzen" className="btn-ghost h-10 px-3.5 rounded font-semibold text-[13px] flex items-center">
             Prijzen

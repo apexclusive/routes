@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Logo from "./Logo";
 import SiteMenu from "./SiteMenu";
+import ThemeSwitch from "./ThemeSwitch";
 import SkipLink from "./SkipLink";
 import ScrollProgress from "./ScrollProgress";
 import { beginCheckout } from "@/lib/billing";
@@ -47,11 +48,11 @@ export default function Pricing() {
   const proMonthly = billing === "year" ? "€3,25" : "€5,99";
 
   return (
-    <div className="min-h-dvh text-slate-100 grain relative overflow-x-clip bg-[#050507]">
+    <div className="min-h-dvh text-slate-100 grain relative overflow-x-clip bg-[var(--base)]">
       <ScrollProgress />
       <SkipLink />
       <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-        <div className="aurora w-[46rem] h-[46rem] bg-[#ffe600]/[0.12] top-[-220px] right-[-160px]" />
+        <div className="aurora w-[46rem] h-[46rem] bg-[var(--accent)]/[0.12] top-[-220px] right-[-160px]" />
         <div className="absolute inset-0 grid-bg" />
       </div>
 
@@ -61,6 +62,7 @@ export default function Pricing() {
           <span className="text-lg font-bold tracking-tight font-display">Apex Pro</span>
         </Link>
         <div className="flex items-center gap-2">
+          <ThemeSwitch />
           <SiteMenu />
           <Link href="/?rit=1" className="btn-brand h-10 px-4 rounded font-semibold text-[13px] flex items-center">
             Open planner

@@ -7,29 +7,29 @@
 @theme {
   /* neutral scale: near-black -> white */
   --color-slate-50: #fafafa;
-  --color-slate-100: #f0f0f0;
+  --color-slate-100: var(--text-strong);
   --color-slate-200: #d4d4d4;
-  --color-slate-300: #a3a3a3;
-  --color-slate-400: #8a8a8a;
-  --color-slate-500: #6e6e6e;
+  --color-slate-300: var(--text-muted);
+  --color-slate-400: var(--text-faint);
+  --color-slate-500: var(--text-faint);
   --color-slate-600: #4a4a4a;
-  --color-slate-700: #2a2a2a;
+  --color-slate-700: var(--scroll-thumb);
   --color-slate-800: #161616;
-  --color-slate-900: #0d0d0d;
-  --color-slate-950: #050507;
+  --color-slate-900: var(--surface-solid);
+  --color-slate-950: var(--base);
 
   /* the ONE accent: yellow (all accent tokens resolve to yellow) */
-  --color-orange-400: #fff27a;
-  --color-orange-500: #ffe600;
-  --color-orange-600: #e6cf00;
-  --color-blue-500: #ffe600;
-  --color-blue-600: #e6cf00;
-  --color-cyan-400: #ffe600;
-  --color-cyan-500: #e6cf00;
-  --color-teal-400: #ffe600;
-  --color-teal-500: #e6cf00;
-  --color-emerald-400: #ffe600;
-  --color-emerald-500: #e6cf00;
+  --color-orange-400: var(--accent-soft);
+  --color-orange-500: var(--accent);
+  --color-orange-600: var(--accent-deep);
+  --color-blue-500: var(--accent);
+  --color-blue-600: var(--accent-deep);
+  --color-cyan-400: var(--accent);
+  --color-cyan-500: var(--accent-deep);
+  --color-teal-400: var(--accent);
+  --color-teal-500: var(--accent-deep);
+  --color-emerald-400: var(--accent);
+  --color-emerald-500: var(--accent-deep);
   /* stray red kept neutral so nothing introduces a second hue */
   --color-rose-400: #d4d4d4;
   --color-rose-500: #b0b0b0;
@@ -39,8 +39,137 @@
   --font-display: "Space Grotesk", "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
-:root {
+:root,
+[data-theme="startgrid"] {
+  color-scheme: dark;
+  /* accent */
   --accent: #ffe600;
+  --accent-rgb: 255 230 0;
+  --accent-soft: #fff27a;
+  --accent-deep: #e6cf00;
+  --accent-warm: #ffb300;
+  --accent-pale: #fff7c2;
+  --accent-contrast: #050507;
+  /* vlakken */
+  --base: #050507;
+  --surface-solid: #0d0d0d;
+  --surface-glass: rgb(12 12 12 / 0.92);
+  --surface-raised: rgb(13 13 13 / 0.95);
+  --surface-hover: rgb(22 22 22 / 0.98);
+  --surface-muted: rgb(6 6 6 / 0.7);
+  /* tekst */
+  --text-strong: #f5f5f5;
+  --text-muted: #a3a3a3;
+  --text-faint: #8a8a8a;
+  /* overlays: wit op donker, zwart op licht */
+  --overlay-rgb: 255 255 255;
+  --shadow-rgb: 0 0 0;
+  --scroll-thumb: #2a2a2a;
+  --scroll-thumb-hover: #3d3d44;
+}
+
+/* Luxe smaragd: diepe groentinten met emerald-accent. */
+[data-theme="smaragd"] {
+  color-scheme: dark;
+  --accent: #10b981;
+  --accent-rgb: 16 185 129;
+  --accent-soft: #6ee7b7;
+  --accent-deep: #059669;
+  --accent-warm: #34d399;
+  --accent-pale: #d1fae5;
+  --accent-contrast: #04120c;
+  --base: #0d1612;
+  --surface-solid: #16241d;
+  --surface-glass: rgb(19 33 27 / 0.92);
+  --surface-raised: rgb(22 36 29 / 0.95);
+  --surface-hover: rgb(30 48 39 / 0.98);
+  --surface-muted: rgb(10 20 16 / 0.7);
+  --text-strong: #f3f4f6;
+  --text-muted: #a7bdb2;
+  --text-faint: #7d9789;
+  --overlay-rgb: 209 250 229;
+  --shadow-rgb: 0 12 8;
+  --scroll-thumb: #24382e;
+  --scroll-thumb-hover: #33513f;
+}
+
+/* Lichte modus: helder, hoog contrast, zelfde merkgeel. */
+[data-theme="licht"] {
+  color-scheme: light;
+  --accent: #8a6600;
+  --accent-rgb: 138 102 0;
+  --accent-soft: #6f5200;
+  --accent-deep: #5c4400;
+  --accent-warm: #7a5b00;
+  --accent-pale: #4f3a00;
+  --accent-contrast: #ffffff;
+  --base: #f7f7f8;
+  --surface-solid: #ffffff;
+  --surface-glass: rgb(255 255 255 / 0.94);
+  --surface-raised: rgb(255 255 255 / 0.97);
+  --surface-hover: rgb(244 244 245 / 0.98);
+  --surface-muted: rgb(255 255 255 / 0.8);
+  --text-strong: #111114;
+  --text-muted: #4a4a52;
+  --text-faint: #63636d;
+  --overlay-rgb: 15 15 20;
+  --shadow-rgb: 15 15 25;
+  --scroll-thumb: #c9c9cf;
+  --scroll-thumb-hover: #a8a8b0;
+}
+
+
+/* ------------------------------------------------------------------
+   Tailwind-schalen per thema.
+   De app is geschreven in donkere klassen (text-slate-400, bg-white/5,
+   text-yellow-300). Tailwind v4 zet die om naar var(--color-*), dus door
+   die tokens per thema te herdefinieren kleurt de hele app mee zonder dat
+   er ergens een dark:-variant nodig is.
+   ------------------------------------------------------------------ */
+
+/* geel-accent volgt het thema-accent */
+:root,
+[data-theme] {
+  --color-yellow-200: var(--accent-pale);
+  --color-yellow-300: var(--accent-soft);
+  --color-yellow-400: var(--accent);
+  --color-yellow-500: var(--accent);
+  --color-yellow-600: var(--accent-deep);
+  --color-yellow-700: var(--accent-deep);
+}
+
+[data-theme="smaragd"] {
+  --color-slate-50: #ffffff;
+  --color-slate-100: #f3f4f6;
+  --color-slate-200: #dbe7e0;
+  --color-slate-300: #b9cfc4;
+  --color-slate-400: #a7bdb2;
+  --color-slate-500: #7d9789;
+  --color-slate-600: #55705f;
+  --color-slate-700: #2b4436;
+  --color-slate-800: #1a2c23;
+  --color-slate-900: #14211b;
+  --color-slate-950: #0d1612;
+  --color-white: #eafff5;
+  --color-black: #04120c;
+}
+
+/* Licht thema: de schaal draait om, zodat "slate-400" leesbaar grijs blijft
+   op wit en "white/5"-overlays juist subtiel donker worden. */
+[data-theme="licht"] {
+  --color-slate-50: #101014;
+  --color-slate-100: #17171c;
+  --color-slate-200: #2a2a32;
+  --color-slate-300: #3f3f49;
+  --color-slate-400: #4a4a52;
+  --color-slate-500: #63636d;
+  --color-slate-600: #8e8e98;
+  --color-slate-700: #cdcdd4;
+  --color-slate-800: #e4e4e8;
+  --color-slate-900: #f1f1f3;
+  --color-slate-950: #f7f7f8;
+  --color-white: #0f0f14;
+  --color-black: #ffffff;
 }
 
 @layer base {
@@ -50,21 +179,21 @@
   }
 
   body {
-    background: #050507;
-    color: #f5f5f5;
+    background: var(--base);
+    color: var(--text-strong);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
 
   ::selection {
-    background: #ffe600;
-    color: #050507;
+    background: var(--accent);
+    color: var(--accent-contrast);
   }
 
   /* tastbare focus voor toetsenbordgebruikers */
   :focus-visible {
-    outline: 2px solid #ffe600;
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
     border-radius: 6px;
   }
@@ -80,14 +209,14 @@
 /* ---------- scrollbar ---------- */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #2a2a2a transparent;
+  scrollbar-color: var(--scroll-thumb) transparent;
 }
 *::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 *::-webkit-scrollbar-thumb {
-  background: #2a2a2a;
+  background: var(--scroll-thumb);
   border-radius: 8px;
 }
 *::-webkit-scrollbar-track {
@@ -96,7 +225,7 @@
 
 /* ---------- helpers ---------- */
 .text-gradient {
-  background: linear-gradient(100deg, #fff27a 0%, #ffe600 100%);
+  background: linear-gradient(100deg, var(--accent-soft) 0%, var(--accent) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -104,33 +233,33 @@
 
 /* solid black panels, crisp borders */
 .glass {
-  background: rgba(12, 12, 12, 0.92);
+  background: var(--surface-glass);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid rgb(var(--overlay-rgb) / 0.14);
 }
 
 .btn-brand {
-  background: #ffe600;
-  color: #050507;
+  background: var(--accent);
+  color: var(--base);
   font-weight: 700;
-  box-shadow: 0 10px 30px rgba(255, 230, 0, 0.22);
+  box-shadow: 0 10px 30px rgb(var(--accent-rgb) / 0.22);
   transition: filter 0.18s ease, transform 0.12s ease, box-shadow 0.18s ease;
 }
 .btn-brand:hover {
   filter: brightness(1.05);
-  box-shadow: 0 14px 40px rgba(255, 230, 0, 0.32);
+  box-shadow: 0 14px 40px rgb(var(--accent-rgb) / 0.32);
 }
 
 .btn-ghost {
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  color: #f5f5f5;
+  border: 1px solid rgb(var(--overlay-rgb) / 0.18);
+  color: var(--text-strong);
   transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease;
 }
 .btn-ghost:hover {
-  border-color: #ffe600;
-  color: #ffe600;
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .glow {
@@ -160,7 +289,7 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #8a8a8a;
+  background: var(--text-faint);
   display: inline-block;
   animation: blink 1.2s infinite;
 }
@@ -205,24 +334,24 @@
 
 /* ---------- leaflet ---------- */
 .leaflet-container {
-  background: #050507;
+  background: var(--base);
   font-family: var(--font-sans);
 }
 .leaflet-control-attribution {
-  background: rgba(6, 6, 6, 0.7) !important;
-  color: #6e6e6e !important;
+  background: var(--surface-muted) !important;
+  color: var(--text-faint) !important;
   font-size: 10px !important;
 }
 .leaflet-control-attribution a {
-  color: #a3a3a3 !important;
+  color: var(--text-muted) !important;
 }
 .leaflet-bar a {
-  background: rgba(13, 13, 13, 0.95) !important;
-  color: #f5f5f5 !important;
-  border-bottom-color: rgba(255, 255, 255, 0.14) !important;
+  background: var(--surface-raised) !important;
+  color: var(--text-strong) !important;
+  border-bottom-color: rgb(var(--overlay-rgb) / 0.14) !important;
 }
 .leaflet-bar a:hover {
-  background: rgba(22, 22, 22, 0.98) !important;
+  background: var(--surface-hover) !important;
 }
 
 /* Donkere Apex-behandeling voor de sleutelvrije Esri-stratenkaart. Alleen de
@@ -232,20 +361,32 @@
   filter: invert(1) hue-rotate(180deg) brightness(0.72) contrast(1.15)
     saturate(0.55);
 }
+/* Smaragd: iets groener doorgetrokken zodat de kaart bij het thema past. */
+[data-theme="smaragd"] .apex-dark-tiles {
+  filter: invert(1) hue-rotate(150deg) brightness(0.7) contrast(1.12)
+    saturate(0.5);
+}
+/* Licht thema: de stratenkaart is van zichzelf al licht — filter eraf. */
+[data-theme="licht"] .apex-dark-tiles {
+  filter: saturate(0.92) contrast(1.02);
+}
+[data-theme="licht"] .leaflet-container {
+  background: #e8e8ea;
+}
 /* ---------- navigatie-ankers en focus-pulse ---------- */
 /* Genummerde stipjes op de routelijn: de punten die Google Maps meekrijgt. */
 .apex-anchor {
   width: 16px;
   height: 16px;
   border-radius: 9999px;
-  background: #0d0d0d;
-  border: 2px solid #ffe600;
-  color: #ffe600;
+  background: var(--surface-solid);
+  border: 2px solid var(--accent);
+  color: var(--accent);
   font-size: 9px;
   font-weight: 700;
   line-height: 12px;
   text-align: center;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 1px 4px rgb(var(--shadow-rgb) / 0.6);
 }
 
 /* POI langs de route (tankstation/laadpaal): compacte donkere chip */
@@ -253,12 +394,12 @@
   width: 22px;
   height: 22px;
   border-radius: 9999px;
-  background: rgba(13, 13, 13, 0.95);
-  border: 1.5px solid rgba(255, 255, 255, 0.55);
+  background: var(--surface-raised);
+  border: 1.5px solid rgb(var(--overlay-rgb) / 0.55);
   font-size: 11px;
   line-height: 19px;
   text-align: center;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 1px 5px rgb(var(--shadow-rgb) / 0.7);
 }
 
 /* Kortstondige pulse op de afslag die je in de routebeschrijving aanklikt. */
@@ -273,14 +414,14 @@
   position: absolute;
   inset: 0;
   border-radius: 9999px;
-  border: 2px solid #ffe600;
+  border: 2px solid var(--accent);
 }
 .apex-focus::before {
   animation: apex-ping 1.4s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 .apex-focus span {
   inset: 6px;
-  background: #ffe600;
+  background: var(--accent);
 }
 @keyframes apex-ping {
   0% {
@@ -385,8 +526,8 @@
 
 /* subtiel raster in de hero, naar beneden wegvallend */
 .grid-bg {
-  background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-image: linear-gradient(rgb(var(--overlay-rgb) / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--overlay-rgb) / 0.05) 1px, transparent 1px);
   background-size: 56px 56px;
   -webkit-mask-image: radial-gradient(ellipse 85% 60% at 50% 0%, black 35%, transparent 78%);
   mask-image: radial-gradient(ellipse 85% 60% at 50% 0%, black 35%, transparent 78%);
@@ -403,7 +544,7 @@
   border-radius: inherit;
   background: radial-gradient(
     340px circle at var(--mx, 50%) var(--my, 50%),
-    rgba(255, 230, 0, 0.1),
+    rgb(var(--accent-rgb) / 0.1),
     transparent 65%
   );
   opacity: 0;
@@ -452,14 +593,14 @@
   width: 26px;
   height: 26px;
   border-radius: 9999px;
-  background: #050507;
-  border: 2px solid #ffe600;
-  color: #ffe600;
+  background: var(--base);
+  border: 2px solid var(--accent);
+  color: var(--accent);
   font-size: 11px;
   font-weight: 800;
   line-height: 22px;
   text-align: center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 2px 10px rgb(var(--shadow-rgb) / 0.7);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -484,7 +625,7 @@
   left: -80%;
   width: 45%;
   height: 100%;
-  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  background: linear-gradient(105deg, transparent, rgb(var(--overlay-rgb) / 0.45), transparent);
   transform: skewX(-20deg);
   transition: none;
   pointer-events: none;
@@ -500,20 +641,20 @@
 
 /* gouden Pro-chip (knop in de planner) */
 .pro-chip {
-  background: linear-gradient(135deg, rgba(255, 230, 0, 0.16), rgba(255, 230, 0, 0.05));
-  border: 1px solid rgba(255, 230, 0, 0.45);
-  color: #ffe600;
+  background: linear-gradient(135deg, rgb(var(--accent-rgb) / 0.16), rgb(var(--accent-rgb) / 0.05));
+  border: 1px solid rgb(var(--accent-rgb) / 0.45);
+  color: var(--accent);
   font-weight: 700;
 }
 .pro-chip:hover {
-  border-color: rgba(255, 230, 0, 0.9);
+  border-color: rgb(var(--accent-rgb) / 0.9);
 }
 
 /* gele gloed rond het roulettewiel */
 
 /* Pro-kaart op de landing: langzaam pulserende gouden rand */
 .pro-card {
-  box-shadow: 0 0 50px -18px rgba(255, 230, 0, 0.4);
+  box-shadow: 0 0 50px -18px rgb(var(--accent-rgb) / 0.4);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -529,17 +670,17 @@
   width: 34px;
   height: 34px;
   border-radius: 9999px;
-  background: #050507;
-  border: 2.5px solid #ffe600;
+  background: var(--base);
+  border: 2.5px solid var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow:
-    0 3px 14px rgba(0, 0, 0, 0.75),
-    0 0 0 6px rgba(255, 230, 0, 0.12);
+    0 3px 14px rgb(var(--shadow-rgb) / 0.75),
+    0 0 0 6px rgb(var(--accent-rgb) / 0.12);
 }
 .apex-ride-arrow {
-  color: #ffe600;
+  color: var(--accent);
   font-size: 15px;
   line-height: 1;
   display: inline-block;
@@ -577,15 +718,15 @@
   border-radius: 28px;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.085),
-    rgba(255, 255, 255, 0.028)
+    rgb(var(--overlay-rgb) / 0.085),
+    rgb(var(--overlay-rgb) / 0.028)
   );
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid rgb(var(--overlay-rgb) / 0.09);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    inset 0 0 26px rgba(255, 255, 255, 0.02),
-    0 30px 60px -25px rgba(0, 0, 0, 0.85),
-    0 8px 24px -12px rgba(0, 0, 0, 0.6);
+    inset 0 1px 0 rgb(var(--overlay-rgb) / 0.14),
+    inset 0 0 26px rgb(var(--overlay-rgb) / 0.02),
+    0 30px 60px -25px rgb(var(--shadow-rgb) / 0.85),
+    0 8px 24px -12px rgb(var(--shadow-rgb) / 0.6);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   transition:
@@ -595,12 +736,12 @@
 }
 .lux-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(255, 230, 0, 0.35);
+  border-color: rgb(var(--accent-rgb) / 0.35);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    0 36px 80px -28px rgba(0, 0, 0, 0.9),
-    0 0 0 1px rgba(255, 230, 0, 0.12),
-    0 0 46px -12px rgba(255, 230, 0, 0.22);
+    inset 0 1px 0 rgb(var(--overlay-rgb) / 0.2),
+    0 36px 80px -28px rgb(var(--shadow-rgb) / 0.9),
+    0 0 0 1px rgb(var(--accent-rgb) / 0.12),
+    0 0 46px -12px rgb(var(--accent-rgb) / 0.22);
 }
 
 /* 3D-tilt met glare voor afbeeldingskaarten */
@@ -618,7 +759,7 @@
   border-radius: inherit;
   background: radial-gradient(
     320px circle at var(--gx, 50%) var(--gy, 50%),
-    rgba(255, 255, 255, 0.22),
+    rgb(var(--overlay-rgb) / 0.22),
     transparent 60%
   );
   opacity: 0;
@@ -698,14 +839,14 @@
       circle at 12% 130%,
       transparent 0,
       transparent 88px,
-      rgba(255, 230, 0, 0.05) 89px,
+      rgb(var(--accent-rgb) / 0.05) 89px,
       transparent 91px
     ),
     repeating-radial-gradient(
       circle at 88% -30%,
       transparent 0,
       transparent 110px,
-      rgba(255, 255, 255, 0.035) 111px,
+      rgb(var(--overlay-rgb) / 0.035) 111px,
       transparent 113px
     );
 }
@@ -718,7 +859,7 @@
   right: 0;
   height: 2.5px;
   transform-origin: 0 50%;
-  background: linear-gradient(90deg, #ffe600, #ff9d00, #ffe600);
+  background: linear-gradient(90deg, var(--accent), var(--accent-warm), var(--accent));
   z-index: 60;
   pointer-events: none;
 }
@@ -740,10 +881,10 @@
    ============================================================ */
 
 :root {
-  --gold-100: #fff7c2;
-  --gold-500: #ffe600;
-  --gold-600: #ffb300;
-  --ink: #050507;
+  --gold-100: var(--accent-pale);
+  --gold-500: var(--accent);
+  --gold-600: var(--accent-warm);
+  --ink: var(--base);
 }
 
 /* filmische basis: koele diepte onderin, warm licht bovenin */
@@ -754,7 +895,7 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(120% 70% at 50% -10%, rgba(255, 214, 10, 0.05), transparent 60%),
+    radial-gradient(120% 70% at 50% -10%, rgb(var(--accent-rgb) / 0.05), transparent 60%),
     radial-gradient(90% 50% at 50% 115%, rgba(20, 24, 40, 0.35), transparent 65%);
 }
 
@@ -774,12 +915,12 @@ h2 {
   font-weight: 600;
   letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: rgba(255, 230, 0, 0.85);
+  color: rgb(var(--accent-rgb) / 0.85);
 }
 
 /* goud-shimmer in gradient-tekst */
 .text-gradient {
-  background: linear-gradient(100deg, #fff7c2 0%, #ffe600 35%, #ffb300 70%, #ffe600 100%);
+  background: linear-gradient(100deg, var(--accent-pale) 0%, var(--accent) 35%, var(--accent-warm) 70%, var(--accent) 100%);
   background-size: 220% 100%;
   -webkit-background-clip: text;
   background-clip: text;
@@ -801,8 +942,8 @@ h2 {
   background: linear-gradient(180deg, rgba(16, 16, 18, 0.88), rgba(9, 9, 11, 0.92));
   backdrop-filter: blur(16px) saturate(1.15);
   -webkit-backdrop-filter: blur(16px) saturate(1.15);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  border: 1px solid rgb(var(--overlay-rgb) / 0.09);
+  box-shadow: inset 0 1px 0 rgb(var(--overlay-rgb) / 0.07);
 }
 
 /* zwevende site-nav: één vorm voor elke pagina */
@@ -810,41 +951,41 @@ h2 {
   border-radius: 18px;
   margin-top: 12px;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.07),
-    0 18px 44px -22px rgba(0, 0, 0, 0.9);
+    inset 0 1px 0 rgb(var(--overlay-rgb) / 0.07),
+    0 18px 44px -22px rgb(var(--shadow-rgb) / 0.9);
 }
 
 /* knoppen: gegolde druk, licht gezweng onder drag */
 .btn-brand {
-  background: linear-gradient(135deg, #ffe600 0%, #ffb300 100%);
-  color: #0a0a0c;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-warm) 100%);
+  color: var(--base);
   font-weight: 700;
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.45) inset,
-    0 12px 34px -10px rgba(255, 190, 0, 0.5);
+    0 1px 0 rgb(var(--overlay-rgb) / 0.45) inset,
+    0 12px 34px -10px rgb(var(--accent-rgb) / 0.5);
   transition: filter 0.18s ease, transform 0.14s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.18s ease;
 }
 .btn-brand:hover {
   filter: brightness(1.06);
   transform: translateY(-1px);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.5) inset,
-    0 18px 48px -12px rgba(255, 190, 0, 0.62);
+    0 1px 0 rgb(var(--overlay-rgb) / 0.5) inset,
+    0 18px 48px -12px rgb(var(--accent-rgb) / 0.62);
 }
 .btn-brand:active {
   transform: translateY(0) scale(0.985);
 }
 
 .btn-ghost {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.13);
-  color: #f0f0f0;
+  background: rgb(var(--overlay-rgb) / 0.02);
+  border: 1px solid rgb(var(--overlay-rgb) / 0.13);
+  color: var(--text-strong);
   transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease, transform 0.14s ease;
 }
 .btn-ghost:hover {
-  border-color: rgba(255, 230, 0, 0.65);
-  color: #ffe600;
-  background: rgba(255, 230, 0, 0.06);
+  border-color: rgb(var(--accent-rgb) / 0.65);
+  color: var(--accent);
+  background: rgb(var(--accent-rgb) / 0.06);
 }
 
 /* kolf-gouden rand rond lux-kaarten bij hover */
@@ -854,23 +995,23 @@ h2 {
 
 /* scrollbar in thema */
 * {
-  scrollbar-color: #2e2e33 transparent;
+  scrollbar-color: var(--scroll-thumb) transparent;
 }
 *::-webkit-scrollbar-thumb {
-  background: #26262b;
+  background: var(--scroll-thumb);
   border-radius: 999px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 *::-webkit-scrollbar-thumb:hover {
-  background: #3d3d44;
+  background: var(--scroll-thumb-hover);
   background-clip: padding-box;
   border: 2px solid transparent;
 }
 
 ::selection {
-  background: rgba(255, 182, 0, 0.9);
-  color: #0a0a0c;
+  background: rgb(var(--accent-rgb) / 0.9);
+  color: var(--base);
 }
 
 /* koplamp: langzaam vegende lichtbundel (hero) */
@@ -884,9 +1025,9 @@ h2 {
   background: linear-gradient(
     100deg,
     transparent 0%,
-    rgba(255, 230, 0, 0.06) 35%,
-    rgba(255, 240, 180, 0.1) 50%,
-    rgba(255, 230, 0, 0.06) 65%,
+    rgb(var(--accent-rgb) / 0.06) 35%,
+    rgb(var(--accent-rgb) / 0.1) 50%,
+    rgb(var(--accent-rgb) / 0.06) 65%,
     transparent 100%
   );
   filter: blur(28px);
@@ -951,10 +1092,10 @@ h2 {
   pointer-events: none;
   z-index: 3;
   background-image:
-    linear-gradient(#ffe600, #ffe600), linear-gradient(#ffe600, #ffe600),
-    linear-gradient(#ffe600, #ffe600), linear-gradient(#ffe600, #ffe600),
-    linear-gradient(#ffe600, #ffe600), linear-gradient(#ffe600, #ffe600),
-    linear-gradient(#ffe600, #ffe600), linear-gradient(#ffe600, #ffe600);
+    linear-gradient(var(--accent), var(--accent)), linear-gradient(var(--accent), var(--accent)),
+    linear-gradient(var(--accent), var(--accent)), linear-gradient(var(--accent), var(--accent)),
+    linear-gradient(var(--accent), var(--accent)), linear-gradient(var(--accent), var(--accent)),
+    linear-gradient(var(--accent), var(--accent)), linear-gradient(var(--accent), var(--accent));
   background-repeat: no-repeat;
   background-size:
     16px 2px, 2px 16px,
@@ -977,8 +1118,8 @@ h2 {
 .stripe-accent {
   background: repeating-linear-gradient(
     -45deg,
-    #ffe600 0 9px,
-    #101012 9px 18px
+    var(--accent) 0 9px,
+    var(--surface-solid) 9px 18px
   );
 }
 
@@ -986,7 +1127,7 @@ h2 {
 .rule-mark {
   position: relative;
   height: 1px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgb(var(--overlay-rgb) / 0.08);
 }
 .rule-mark::after {
   content: "";
@@ -997,7 +1138,7 @@ h2 {
   width: 5px;
   height: 5px;
   rotate: 45deg;
-  background: #ffe600;
+  background: var(--accent);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1045,14 +1186,14 @@ body::after {
   z-index: -1;
   pointer-events: none;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
+    linear-gradient(rgb(var(--overlay-rgb) / 0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--overlay-rgb) / 0.022) 1px, transparent 1px);
   background-size: 32px 32px;
 }
 
 /* -- markeerstift-geel voor kernwoorden -- */
 .hl {
-  background: linear-gradient(180deg, transparent 86%, rgba(255, 230, 0, 0.5) 86%);
+  background: linear-gradient(180deg, transparent 86%, rgb(var(--accent-rgb) / 0.5) 86%);
   color: inherit;
   padding: 0 0.06em 0.04em;
   box-decoration-break: clone;
@@ -1109,7 +1250,7 @@ body::after {
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.2em;
-  color: rgba(255, 230, 0, 0.9);
+  color: rgb(var(--accent-rgb) / 0.9);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1118,4 +1259,59 @@ body::after {
     transition: none;
     transform: scaleX(0);
   }
+}
+
+/* ------------------------------------------------------------------
+   Zwaarteklassen van de klimranglijst.
+   Het merkpalet klapt bewust alle accenten naar geel, dus de vijf
+   zwaarteniveaus krijgen een eigen, expliciete schaal — anders is
+   "instap" niet van "buitencategorie" te onderscheiden. De schaal
+   loopt van koel/rustig naar warm/zwaar en kantelt mee per thema.
+   ------------------------------------------------------------------ */
+.zwaarte {
+  --z: var(--text-muted);
+  border: 1px solid rgb(var(--z-rgb) / 0.32);
+  background: rgb(var(--z-rgb) / 0.11);
+  color: var(--z);
+}
+.zwaarte-instap {
+  --z-rgb: 52 211 153;
+  --z: #6ee7b7;
+}
+.zwaarte-pittig {
+  --z-rgb: 163 230 53;
+  --z: #bef264;
+}
+.zwaarte-zwaar {
+  --z-rgb: 250 204 21;
+  --z: #fde047;
+}
+.zwaarte-loodzwaar {
+  --z-rgb: 251 146 60;
+  --z: #fdba74;
+}
+.zwaarte-buitencategorie {
+  --z-rgb: 248 113 113;
+  --z: #fca5a5;
+}
+
+/* Op licht wordt dezelfde schaal donkerder, anders verdwijnt hij in het wit. */
+[data-theme="licht"] .zwaarte {
+  background: rgb(var(--z-rgb) / 0.16);
+  border-color: rgb(var(--z-rgb) / 0.5);
+}
+[data-theme="licht"] .zwaarte-instap {
+  --z: #046c4e;
+}
+[data-theme="licht"] .zwaarte-pittig {
+  --z: #4d7c0f;
+}
+[data-theme="licht"] .zwaarte-zwaar {
+  --z: #854d0e;
+}
+[data-theme="licht"] .zwaarte-loodzwaar {
+  --z: #9a3412;
+}
+[data-theme="licht"] .zwaarte-buitencategorie {
+  --z: #b91c1c;
 }

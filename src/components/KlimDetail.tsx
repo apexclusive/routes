@@ -5,6 +5,7 @@ import { Mountain, BedDouble, Road, ArrowLeft, Route as RouteIcon } from "lucide
 import Logo from "./Logo";
 import SiteMenu from "./SiteMenu";
 import LangSwitch from "./LangSwitch";
+import ThemeSwitch from "./ThemeSwitch";
 import ScrollProgress from "./ScrollProgress";
 import SkipLink from "./SkipLink";
 import { CLIMBS, type Climb, type EventCountry } from "@/lib/climbs";
@@ -13,6 +14,7 @@ import TripExtras from "./TripExtras";
 import ShareButton from "./ShareButton";
 import DeelKaart from "./DeelKaart";
 import { buildKlimFaq } from "@/lib/faq";
+import { klimtijdMinuten, rankClimbs, rateClimb } from "@/lib/climbscore";
 import { ChevronDown } from "lucide-react";
 
 const LAND_NAAM: Record<EventCountry, string> = {
@@ -28,8 +30,21 @@ const LAND_NAAM: Record<EventCountry, string> = {
 
 export default function KlimDetail({ klim }: { klim: Climb }) {
   const km = (klim.lengthM / 1000).toFixed(1).replace(".", ",");
-  const zwaarste = CLIMBS.reduce((a, b) => (b.elevationM > a.elevationM ? b : a));
-  const zwaartePct = Math.round((klim.elevationM / zwaarste.elevationM) * 100);
+  const score = rateClimb(klim, CLIMBS);
+  const ranglijst = rankClimbs(CLIMBS);
+  const rang = ranglijst.find((r) => r.climb.id === klim.id)?.rang ?? ranglijst.length;
+  const zwaarste = ranglijst[0].climb;
+  const zwaartePct = score.relatief;
+  const tijd = klimtijdMinuten(klim);
+  const KLASSE_KLEUR: Record<string, string> = {
+    instap: "zwaarte zwaarte-instap",
+    pittig: "zwaarte zwaarte-pittig",
+    zwaar: "zwaarte zwaarte-zwaar",
+    loodzwaar: "zwaarte zwaarte-loodzwaar",
+    buitencategorie: "zwaarte zwaarte-buitencategorie",
+  };
+  const mmss = (m: number) =>
+    m >= 60 ? `${Math.floor(m / 60)}u ${String(m % 60).padStart(2, "0")}m` : `${m} min`;
   const faq = buildKlimFaq(klim);
   const landgenoten = CLIMBS.filter(
     (c) => c.country === klim.country && c.id !== klim.id
@@ -41,11 +56,11 @@ export default function KlimDetail({ klim }: { klim: Climb }) {
   };
 
   return (
-    <div className="min-h-dvh text-slate-100 grain relative overflow-x-clip bg-[#050507]">
+    <div className="min-h-dvh text-slate-100 grain relative overflow-x-clip bg-[var(--base)]">
       <ScrollProgress />
       <SkipLink />
       <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-        <div className="aurora w-[42rem] h-[42rem] bg-[#ffe600]/[0.10] top-[-180px] left-[-140px]" />
+        <div className="aurora w-[42rem] h-[42rem] bg-[var(--accent)]/[0.10] top-[-180px] left-[-140px]" />
         <div className="absolute inset-0 grid-bg" />
       </div>
 
@@ -64,6 +79,7 @@ export default function KlimDetail({ klim }: { klim: Climb }) {
           <Link href="/kalender" className="btn-ghost h-10 px-3.5 rounded font-medium text-[13px] hidden sm:flex">
             Kalender
           </Link>
+          <ThemeSwitch />
           <LangSwitch className="hidden sm:flex" />
           <Link href="/" className="btn-brand h-10 px-4 rounded font-semibold text-[13px] hidden sm:block">
             Naar de planner
@@ -120,11 +136,24 @@ export default function KlimDetail({ klim }: { klim: Climb }) {
         </div>
 
         <div className="glass rounded border border-white/10 p-5 mb-6">
-          <div className="flex items-baseline justify-between mb-2">
-            <h2 className="font-display font-bold text-[14px]">Zwaarte in context</h2>
-            <p className="text-[11px] text-slate-500">
-              t.o.v. {zwaarste.name} ({zwaarste.elevationM} hm)
-            </p>
+          <div className="flex flex-wrap items-baseline justify-between gap-2 mb-3">
+            <h2 className="font-display font-bold text-[14px]">Zwaarte volgens de FIETS-index</h2>
+            <Link
+              href="/klimmen/ranglijst"
+              className="text-[11px] text-slate-500 hover:text-yellow-300 transition-colors"
+            >
+              #{rang} van {CLIMBS.length} in de ranglijst · zwaarste is {zwaarste.name}
+            </Link>
+          </div>
+          <div className="flex flex-wrap items-center gap-2.5 mb-3">
+            <span className="font-display font-bold text-3xl font-mono text-yellow-300">
+              {String(score.score).replace(".", ",")}
+            </span>
+            <span
+              className={`px-2.5 py-1 rounded text-[11px] font-bold uppercase tracking-wide ${KLASSE_KLEUR[score.klasse]}`}
+            >
+              {score.klasse}
+            </span>
           </div>
           <div className="h-3 rounded bg-white/5 border border-white/10 overflow-hidden">
             <div
@@ -132,8 +161,28 @@ export default function KlimDetail({ klim }: { klim: Climb }) {
               style={{ width: `${Math.max(zwaartePct, 4)}%` }}
             />
           </div>
-          <p className="text-[12px] text-slate-400 mt-2">
-            {zwaartePct}% van de zwaarste beklimming in de bibliotheek.
+          <p className="text-[12px] text-slate-400 mt-2 leading-relaxed">
+            {score.label} Dat is {zwaartePct}% van de zwaarste beklimming in de
+            bibliotheek. De FIETS-index weegt hoogtemeters kwadratisch tegen de
+            lengte en corrigeert voor hoogte boven 1000 m.
+          </p>
+          <div className="grid grid-cols-3 gap-2 mt-4">
+            {[
+              { label: "Recreant", waarde: mmss(tijd.recreant) },
+              { label: "Sportief", waarde: mmss(tijd.sportief) },
+              { label: "Profniveau", waarde: mmss(tijd.pro) },
+            ].map((t) => (
+              <div key={t.label} className="bg-white/5 rounded p-2.5 text-center">
+                <p className="text-[9px] uppercase tracking-wide text-slate-500 mb-0.5">
+                  {t.label}
+                </p>
+                <p className="text-[13px] font-bold font-mono text-slate-200">{t.waarde}</p>
+              </div>
+            ))}
+          </div>
+          <p className="text-[11px] text-slate-500 mt-2">
+            Indicatieve klimtijden op de fiets, berekend uit de hoogtemeters bij
+            600 / 950 / 1500 hoogtemeter per uur.
           </p>
         </div>
 

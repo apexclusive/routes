@@ -3,7 +3,7 @@ import Logo from "@/components/Logo";
 /** Route-level laadstaat: STARTGRID-stil, geen layout-shift. */
 export default function Loading() {
   return (
-    <div className="h-dvh w-full bg-[#050507] flex flex-col items-center justify-center gap-4">
+    <div className="h-dvh w-full bg-[var(--base)] flex flex-col items-center justify-center gap-4">
       <Logo size={44} />
       <div
         role="status"

@@ -121,7 +121,7 @@ export default function Bucketlist() {
               cy="40"
               r={R}
               fill="none"
-              stroke="#ffe600"
+              stroke="var(--accent)"
               strokeWidth="7"
               strokeLinecap="round"
               strokeDasharray={C}
